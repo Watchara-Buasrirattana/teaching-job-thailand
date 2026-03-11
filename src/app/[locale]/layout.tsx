@@ -2,6 +2,7 @@ import { Prompt } from "next/font/google";
 import type { Metadata } from "next";
 import "../globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -45,6 +46,7 @@ export default async function RootLayout({
           <main>
             {children}
           </main>
+          <Footer />
         </NextIntlClientProvider>
       </body>
     </html>

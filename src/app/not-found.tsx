@@ -1,21 +1,32 @@
+// src/app/not-found.tsx
+import "@/app/globals.css"; // ✅ ต้อง Import CSS ตรงนี้ด้วย
+import { Prompt } from "next/font/google"; // ✅ เรียกใช้ฟอนต์ตรงๆ
 
-import Link from 'next/link';
+const prompt = Prompt({
+    weight: ['300', '400', '700'],
+    subsets: ["latin", "thai"],
+    display: 'swap',
+});
 
-export default function NotFound() {
+export default function RootNotFound() {
     return (
-        <div className="flex items-center justify-center min-h-screen bg-white">
-            <div className="text-center px-4">
-                <h1 className="text-9xl font-bold text-primary">404</h1>
-                <p className="text-2xl md:text-4xl mt-4 text-gray-700">
-                    Sorry, the page you are looking for does not exist.
-                </p>
-                <a
-                    href="/"
-                    className="mt-8 inline-block bg-accent text-primary font-bold px-8 py-3 rounded-full shadow-lg transition-transform hover:scale-105"
-                >
-                    Back to Home
-                </a>
-            </div>
-        </div>
+        <html lang="en">
+            {/* ✅ ใส่ className ของฟอนต์ที่ body */}
+            <body className={`${prompt.className} flex items-center justify-center min-h-screen bg-primary text-white`}>
+                <div className="text-center px-4">
+                    {/* เปลี่ยน text-primary เป็น text-accent เพื่อให้มองเห็นเลข 404 */}
+                    <h1 className="text-9xl text-primary">404</h1>
+                    <p className="text-2xl md:text-4xl mt-4">
+                        Sorry, the page you are looking for does not exist.
+                    </p>
+                    <a
+                        href="/"
+                        className="mt-8 inline-block bg-primary text-white font-bold px-8 py-3 rounded-full transition-all hover:scale-105"
+                    >
+                        Back to Home
+                    </a>
+                </div>
+            </body>
+        </html>
     );
 }
