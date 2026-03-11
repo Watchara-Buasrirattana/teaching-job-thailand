@@ -3,8 +3,6 @@ import createMiddleware from 'next-intl/middleware';
 export default createMiddleware({
     // รายชื่อภาษาที่รองรับทั้งหมด
     locales: ['en', 'th'],
-
-    // ภาษาเริ่มต้นถ้าผู้ใช้เข้าหน้าเว็บแบบไม่มีรหัสภาษา
     defaultLocale: 'en'
 });
 
