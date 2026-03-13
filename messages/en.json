@@ -1,13 +1,41 @@
 {
     "Navbar": {
         "home": "Home",
-        "news": "News",
-        "work": "Works",
+        "news": "News&Updates",
+        "team": "Team&Partners",
         "contact": "Submit Resume"
     },
     "NotFound": {
         "title": "Sorry, the page you are looking for does not exist.",
         "backHome": "Back to Home"
+    },
+    "Footer": {
+        "contact": "Contact Us",
+        "address1": "Headquarters Address: 935/7 Moo 14, Sila Sub-district,",
+        "address2": "Mueang District, Khon Kaen 40000",
+        "address3": "Phone: (+66) 81 659 0093"
+    },
+    "Hero": {
+        "title": "Bridging Education with\nProfessional Foreign Teachers",
+        "detail": "High-quality teacher recruitment, visa support,\nand English camp management.",
+        "contactUs": "Contact Us"
+    },
+    "Features": {
+        "title1": "Comprehensive Foreign Teacher Services",
+        "detail1": "Recruitment, Management, English Camps, and Customized Curriculum Development.",
+        "title2": "Guaranteed Quality & Continuity",
+        "detail2": "Seamless teaching experience with our reliable substitute teacher system.",
+        "title3": "Expert & Highly Experienced Team",
+        "detail3": "Every teacher is professionally trained by experts to ensure classroom performance.",
+        "title4": "100% Visa & Document Management",
+        "detail4": "Hassle-free documentation. We handle all visas and work permits in one place."
+    },
+    "AboutUs" : {
+        "title": "About Us",
+        "detail": "P&K Progressive English Co., Ltd. (PKP) provides comprehensive English language education services. The company specializes in recruiting high-quality native and non-native English-speaking teachers for schools across Thailand. All teachers are carefully selected and trained in teaching methodologies, child psychology, classroom management, and Thai cultural etiquette to ensure an effective and engaging learning experience for students."
+    },
+    "News": {
+        "title": "News & Updates",
+        "more": "Read More"
     }
-
 }

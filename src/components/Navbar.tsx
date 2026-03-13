@@ -15,7 +15,7 @@ export default function Navbar() {
         const nextLocale = locale === 'th' ? 'en' : 'th';
         
         // สั่งเปลี่ยนภาษาโดยรักษา URL เดิมไว้
-        router.replace(pathname, { locale: nextLocale });
+        router.replace(pathname, { locale: nextLocale, scroll: false });
     };
 
     // ฟังก์ชันช่วยจัดการสี Active
@@ -58,8 +58,8 @@ export default function Navbar() {
                                 </li>
 
                                 <li>
-                                    <Link className={getLinkClass('/work')} href="/work">
-                                        {t('work')}
+                                    <Link className={getLinkClass('/team')} href="/team">
+                                        {t('team')}
                                     </Link>
                                 </li>
 
@@ -70,7 +70,7 @@ export default function Navbar() {
                                 </li>
 
                                 <li>
-                                    <button onClick={toggleLanguage} className="text-xl py-2 px-4 rounded-full transition-all hover:cursor-pointer hover:scale-105 bg-accent text-primary active:scale-95">
+                                    <button onClick={toggleLanguage} className="bg-accent text-primary text-xl py-2 px-4 rounded-full transition-all hover:cursor-pointer hover:scale-105 active:scale-95">
                                         ไทย/EN
                                     </button>
                                 </li>

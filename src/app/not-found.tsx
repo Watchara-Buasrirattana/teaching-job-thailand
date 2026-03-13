@@ -1,6 +1,7 @@
 // src/app/not-found.tsx
-import "@/app/globals.css"; // ✅ ต้อง Import CSS ตรงนี้ด้วย
-import { Prompt } from "next/font/google"; // ✅ เรียกใช้ฟอนต์ตรงๆ
+import "@/app/globals.css";
+import { Prompt } from "next/font/google";
+import Link from "next/link";
 
 const prompt = Prompt({
     weight: ['300', '400', '700'],
@@ -19,12 +20,12 @@ export default function RootNotFound() {
                     <p className="text-2xl md:text-4xl mt-4">
                         Sorry, the page you are looking for does not exist.
                     </p>
-                    <a
+                    <Link
                         href="/"
                         className="mt-8 inline-block bg-primary text-white font-bold px-8 py-3 rounded-full transition-all hover:scale-105"
                     >
                         Back to Home
-                    </a>
+                    </Link>
                 </div>
             </body>
         </html>

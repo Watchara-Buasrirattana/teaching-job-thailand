@@ -1,6 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing'; // ใช้ Link ของ i18n เพื่อรักษาภาษาไว้
+import { Link } from '@/i18n/routing';
 
 export default function NotFound() {
     const t = useTranslations('NotFound');
