@@ -3,8 +3,11 @@ import { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import Breadcrumb from '@/components/Breadcrumb';
 import SuccessModal from '@/components/SuccessModal';
+import { useTranslations } from 'next-intl';
 
 export default function ContactPage() {
+    const t = useTranslations("Contact");
+    
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -15,7 +18,7 @@ export default function ContactPage() {
 
     return (
         <main className="min-h-screen bg-white pb-20 font-prompt">
-            <div className="container mx-auto max-w-5xl px-4 pt-10">
+            <div className="container mx-auto max-w-7xl px-4 pt-10">
                 <Breadcrumb 
                     paths={[{ label: "หน้าแรก", href: "/" }, { label: "ร่วมงานกับเรา" }]} 
                 />

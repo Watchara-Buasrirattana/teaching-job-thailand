@@ -39,11 +39,11 @@ export default function TeamPage({
                 />
 
                 <h1 className="text-5xl font-bold text-primary text-center my-10 max-md:text-3xl">
-                    Our Foreign Teachers
+                    {t('title')}
                 </h1>
                 
-                <p className="max-w-5xl mx-auto text-center text-gray-600 mb-12 text-sm md:text-base leading-relaxed">
-                    We connect high-quality foreign teachers with the right schools, paying close attention to every detail...
+                <p className="max-w-7xl mx-auto text-center mb-12 text-sm md:text-base leading-relaxed">
+                    {t('detail')}
                 </p>
 
                 {/* 1. ส่วนแสดงการ์ดครู (ที่มี Pagination) */}
@@ -67,16 +67,14 @@ export default function TeamPage({
                 {/* 2. ส่วนรายชื่อ Executives / Coordinators (ไม่ต้องทำ Pagination) */}
                 <div className="grid grid-cols-3 gap-10 pt-16 max-md:grid-cols-1">
                     <section>
-                        <h2 className="text-3xl font-bold text-primary mb-6">Executives</h2>
+                        <h2 className="text-3xl font-bold text-primary mb-6">{t('executives')}</h2>
                         <ul className="space-y-2 text-gray-700">
                             <li>1. Mr. Damian Ketsemabom Akuli</li>
                             <li>2. Mrs. Parinda Akuli</li>
-                            <li>3. Mr. Steve Hall</li>
-                            <li>4. Miss Kanya Wijitsakulsak</li>
                         </ul>
                     </section>
                     <section>
-                        <h2 className="text-3xl font-bold text-primary mb-6">Coordinators</h2>
+                        <h2 className="text-3xl font-bold text-primary mb-6">{t('coordinators')}</h2>
                         <ul className="space-y-2 text-gray-700">
                             <li>1. Miss Ploypailin Patiyansupong</li>
                             <li>2. Mrs. Orathai Tatawatorn</li>
@@ -85,7 +83,7 @@ export default function TeamPage({
                         </ul>
                     </section>
                     <section>
-                        <h2 className="text-3xl font-bold text-primary mb-6">Legal Advisor</h2>
+                        <h2 className="text-3xl font-bold text-primary mb-6">{t('legalAdvisor')}</h2>
                         <p className="text-gray-700">Mr. Thawatchai Lakornthai</p>
                     </section>
                 </div>
@@ -93,7 +91,7 @@ export default function TeamPage({
                 {/* 3. ส่วนพันธมิตร (Trusted by...) */}
                 <section className="mt-32 pt-16">
                     <h2 className="text-4xl font-bold text-primary text-center mb-10 max-md:text-2xl">
-                        Trusted by Educational Institutions and Partners
+                        {t('trusted')}
                     </h2>
                     {/* ใช้ columns-2 เพื่อประหยัดพื้นที่บนจอใหญ่ */}
                     <div className="text-[13px] text-gray-600 space-y-3 max-w-6xl mx-auto md:columns-2 gap-20 max-md:columns-1">
@@ -107,8 +105,8 @@ export default function TeamPage({
 
                 {/* แถบสรุปสีเหลืองด้านล่างสุด */}
                 <div className="mt-20 bg-accent p-8 text-center rounded-sm shadow-sm">
-                    <p className="text-primary font-bold text-lg max-md:text-sm">
-                        In addition, we provide expert legal consultancy, covering Work Permit applications, Visa applications, and Visa Type conversions for employment.
+                    <p className="text-primary font-bold max-md:text-sm">
+                        {t('more')}
                     </p>
                 </div>
             </div>
