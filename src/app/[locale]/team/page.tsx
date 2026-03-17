@@ -2,12 +2,13 @@
 import Breadcrumb from "@/components/Breadcrumb";
 import TeacherCard from "@/components/TeacherCard";
 import Pagination from "@/components/Pagination";
+import ReviewCard from "@/components/ReviewCard";
 import { useTranslations } from "next-intl";
 
-export default function TeamPage({ 
-    searchParams 
-}: { 
-    searchParams: { page?: string } 
+export default function TeamPage({
+    searchParams
+}: {
+    searchParams: { page?: string }
 }) {
     const t = useTranslations("Team");
 
@@ -26,22 +27,33 @@ export default function TeamPage({
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
+    const reviews = [
+        {
+            title: "มีความเป็นมืออาชีพและไม่ต้องกังวลเรื่องเอกสาร!",
+            text: "การย้ายมาสอนที่ไทยดูเป็นเรื่องใหญ่ แต่ PKP ช่วยให้ขั้นตอนวีซ่าและใบอนุญาตทำงานราบรื่นอย่างไม่น่าเชื่อ...",
+            name: "Jonathan Davies",
+            country: "สหรัฐอเมริกา",
+            image: "/teacher.png"
+        },
+        // ก๊อปปี้เพิ่มให้ครบ 6 อันตามรูป
+    ];
     // ----------------------------
 
     return (
         <main className="bg-white pb-20 font-prompt">
             <div className="container mx-auto max-w-7xl px-4 py-10">
-                <Breadcrumb 
+                <Breadcrumb
                     paths={[
-                        { label: "Home", href: "/" }, 
+                        { label: "Home", href: "/" },
                         { label: "Team&Partners" }
-                    ]} 
+                    ]}
                 />
 
                 <h1 className="text-5xl font-bold text-primary text-center my-10 max-md:text-3xl">
                     {t('title')}
                 </h1>
-                
+
                 <p className="max-w-7xl mx-auto text-center mb-12 text-sm md:text-base leading-relaxed">
                     {t('detail')}
                 </p>
@@ -49,10 +61,10 @@ export default function TeamPage({
                 {/* 1. ส่วนแสดงการ์ดครู (ที่มี Pagination) */}
                 <div className="grid grid-cols-5 gap-4 mb-10 max-md:grid-cols-2">
                     {displayedTeachers.map((teacher, index) => (
-                        <TeacherCard 
-                            key={index} 
-                            name={teacher.name} 
-                            nationality={teacher.nationality} 
+                        <TeacherCard
+                            key={index}
+                            name={teacher.name}
+                            nationality={teacher.nationality}
                         />
                     ))}
                 </div>
@@ -63,6 +75,27 @@ export default function TeamPage({
                         <Pagination totalPages={totalPages} />
                     </div>
                 )}
+                
+                <section className="py-12 bg-[#ECF0FF]">
+                    <div className="container mx-auto max-w-7xl px-4">
+                        {/* Header */}
+                        <div className="text-center mb-12">
+                            <h2 className="text-5xl font-bold text-primary mb-6 max-md:text-3xl">
+                                {t('review')}
+                            </h2>
+                            <p className="max-w-6xl mx-auto text-sm md:text-base leading-relaxed">
+                                {t('reviewdetail')}
+                            </p>
+                        </div>
+
+                        {/* Grid: Desktop 3 columns / Mobile 1 column */}
+                        <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
+                            {reviews.map((item, index) => (
+                                <ReviewCard key={index} {...item} />
+                            ))}
+                        </div>
+                    </div>
+                </section>
 
                 {/* 2. ส่วนรายชื่อ Executives / Coordinators (ไม่ต้องทำ Pagination) */}
                 <div className="grid grid-cols-3 gap-10 pt-16 max-md:grid-cols-1">
