@@ -1,6 +1,7 @@
 // src/components/NewsCard.tsx
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 interface NewsCardProps {
     id: string;
@@ -11,6 +12,7 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ id, title, detail, date, img }: NewsCardProps) {
+    const t2 = useTranslations('News');
     return (
         <Link 
             href={`/news/${id}`} 
@@ -36,7 +38,7 @@ export default function NewsCard({ id, title, detail, date, img }: NewsCardProps
                 </div>
                 <div className="flex justify-end items-end mt-4">
                     <span className="text-[10px] opacity-70">
-                        โพสต์เมื่อ: {date}
+                        {t2('posted')} {date}
                     </span>
                 </div>
             </div>

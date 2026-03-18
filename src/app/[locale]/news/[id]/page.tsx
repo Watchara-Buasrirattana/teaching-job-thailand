@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 export default function NewsDetail({ params }: { params: { id: string, locale: string } }) {
     const t = useTranslations('Navbar');
+    const t2 = useTranslations('News');
     // ในอนาคตใช้ params.id ไปดึงข้อมูลจาก API หรือไฟล์ JSON
     const news = {
         title: "PKP ร่วมจัดกิจกรรม \"English Camp 2026\" มุ่งทักษะภาษาอังกฤษ สร้างความกล้าแสดงออกให้เยาวชน",
@@ -36,7 +37,7 @@ export default function NewsDetail({ params }: { params: { id: string, locale: s
                             {news.title}
                         </h1>
                     </div>
-                    <p className="text-gray-400 text-sm mt-4">โพสต์เมื่อ {news.date}</p>
+                    <p className="text-gray-400 text-sm mt-4">{t2('posted')} {news.date}</p>
                 </div>
 
                 {/* 3. รูปภาพหลัก (ใช้ relative + aspect-video) */}

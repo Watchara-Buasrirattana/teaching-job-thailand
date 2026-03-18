@@ -31,6 +31,7 @@ export default function Footer() {
                     <p className="text-lg">{t('address1')}</p>
                     <p className="text-lg">{t('address2')}</p>
                     <p className="text-lg">{t('address3')}</p>
+                    <p className="text-lg">{t('address4')}</p>
 
                     {/* Social Icons */}
                     <div className="flex gap-4 mt-2">

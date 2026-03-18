@@ -33,7 +33,7 @@ export default function SuccessModal({ isOpen, onClose }: SuccessModalProps) {
 
                 <Link
                     href="/"
-                    className="inline-block bg-[#0b0087] text-white px-10 py-3 rounded-full text-lg font-bold hover:bg-blue-900 transition-all"
+                    className="inline-block bg-primary text-white px-10 py-3 rounded-full text-lg font-bold hover:bg-blue-900 transition-all"
                 >
                     กลับสู่หน้าหลัก
                 </Link>

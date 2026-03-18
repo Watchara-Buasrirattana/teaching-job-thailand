@@ -12,6 +12,11 @@ export default function TeamPage({
 }) {
     const t = useTranslations("Team");
 
+    const executivesList = t.raw("executivesList");
+    const coordinatorsList = t.raw("coordinatorsList");
+    const schoolsList = t.raw("schoolsList");
+    const honoredList = t.raw("honoredList");
+
     // --- ส่วนของระบบ Pagination ---
     const itemsPerPage = 5; // แสดงครู 10 คนต่อหน้า (2 แถวบน Desktop)
     const currentPage = Number(searchParams.page) || 1;
@@ -75,7 +80,7 @@ export default function TeamPage({
                         <Pagination totalPages={totalPages} />
                     </div>
                 )}
-                
+
                 <section className="py-12 bg-[#ECF0FF]">
                     <div className="container mx-auto max-w-7xl px-4">
                         {/* Header */}
@@ -100,40 +105,61 @@ export default function TeamPage({
                 {/* 2. ส่วนรายชื่อ Executives / Coordinators (ไม่ต้องทำ Pagination) */}
                 <div className="grid grid-cols-3 gap-10 pt-16 max-md:grid-cols-1">
                     <section>
-                        <h2 className="text-3xl font-bold text-primary mb-6">{t('executives')}</h2>
-                        <ul className="space-y-2 text-gray-700">
-                            <li>1. Mr. Damian Ketsemabom Akuli</li>
-                            <li>2. Mrs. Parinda Akuli</li>
-                        </ul>
+                        <h2 className="text-4xl font-bold text-primary mb-6">{t('executives')}</h2>
+                        <ol className="list-decimal pl-5 space-y-2">
+                            {executivesList.map((name: string, idx: number) => (
+                                <li key={idx}>{name}</li>
+                            ))}
+                        </ol>
                     </section>
+
                     <section>
-                        <h2 className="text-3xl font-bold text-primary mb-6">{t('coordinators')}</h2>
-                        <ul className="space-y-2 text-gray-700">
-                            <li>1. Miss Ploypailin Patiyansupong</li>
-                            <li>2. Mrs. Orathai Tatawatorn</li>
-                            <li>3. Miss Netinart Paiboonworapisit</li>
-                            <li>4. Miss Chanakarn Limtongnoi</li>
-                        </ul>
+                        <h2 className="text-4xl font-bold text-primary mb-6">
+                            {t('coordinators')}
+                        </h2>
+                        <ol className="list-decimal pl-5 space-y-2">
+                            {coordinatorsList.map((name: string, idx: number) => (
+                                <li key={idx}>{name}</li>
+                            ))}
+                        </ol>
                     </section>
+
                     <section>
-                        <h2 className="text-3xl font-bold text-primary mb-6">{t('legalAdvisor')}</h2>
-                        <p className="text-gray-700">Mr. Thawatchai Lakornthai</p>
+                        <h2 className="text-4xl font-bold text-primary mb-6">
+                            {t('legalAdvisor')}
+                        </h2>
+                        <p className="">
+                            {t('legalAdvisorName')}
+                        </p>
                     </section>
                 </div>
 
                 {/* 3. ส่วนพันธมิตร (Trusted by...) */}
-                <section className="mt-32 pt-16">
+                <section className="mt-16 pt-16">
                     <h2 className="text-4xl font-bold text-primary text-center mb-10 max-md:text-2xl">
                         {t('trusted')}
                     </h2>
-                    {/* ใช้ columns-2 เพื่อประหยัดพื้นที่บนจอใหญ่ */}
-                    <div className="text-[13px] text-gray-600 space-y-3 max-w-6xl mx-auto md:columns-2 gap-20 max-md:columns-1">
-                        <p>• Kaennakhon Witthayayon School (International Program), Khon Kaen</p>
-                        <p>• Ban Phai School, Khon Kaen</p>
-                        <p>• Nakhon Khon Kaen School, Khon Kaen</p>
-                        <p>• Ubolratana Pittayakom School, Khon Kaen</p>
-                        {/* ... รายชื่อโรงเรียนอื่นๆ ใส่ต่อได้เลยครับ ... */}
-                    </div>
+                    <p className="text-center mb-10">
+                        {t('trustedDetail')}
+                    </p>
+
+                    {/* ✅ ใช้ <ul> กับ list-disc และ pl-5 */}
+                    <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto md:columns-2 gap-20 max-md:columns-1">
+                        {schoolsList.map((school: string, idx: number) => (
+                            <li key={idx} className="break-inside-avoid">{school}</li>
+                        ))}
+                    </ul>
+
+                    <p className="text-center m-10">
+                        {t('honored')}
+                    </p>
+                    <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto">
+                        {honoredList.map((honored: string, idx: number) => (
+                            <li key={idx} className="break-inside-avoid">
+                                {honored}
+                            </li>
+                        ))}
+                    </ul>
                 </section>
 
                 {/* แถบสรุปสีเหลืองด้านล่างสุด */}

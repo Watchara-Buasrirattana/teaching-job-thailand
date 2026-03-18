@@ -6,8 +6,9 @@ import SuccessModal from '@/components/SuccessModal';
 import { useTranslations } from 'next-intl';
 
 export default function ContactPage() {
-    const t = useTranslations("Contact");
-    
+    const t = useTranslations("Navbar");
+    const t2 = useTranslations("Contact");
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -17,17 +18,19 @@ export default function ContactPage() {
     };
 
     return (
-        <main className="min-h-screen bg-white pb-20 font-prompt">
+        <main className="bg-white pb-20 font-prompt">
             <div className="container mx-auto max-w-7xl px-4 pt-10">
-                <Breadcrumb 
-                    paths={[{ label: "หน้าแรก", href: "/" }, { label: "ร่วมงานกับเรา" }]} 
+                <Breadcrumb
+                    paths={[
+                        { label: t('home'), href: "/" },
+                        { label: t('contact') }
+                    ]}
                 />
 
                 <section className="text-center mt-10 mb-16">
-                    <h1 className="text-5xl font-bold text-primary mb-6">ร่วมงานกับเรา</h1>
-                    <p className="text-gray-600 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
-                        หากคุณรักในการสอนและอยากสัมผัสประสบการณ์ใหม่ๆ ในโรงเรียนในประเทศไทย
-                        เราพร้อมเป็นพาร์ทเนอร์ที่ช่วยดูแลคุณ ทั้งการจัดหาโรงเรียนที่เหมาะสมและการดูแลอย่างใกล้ชิด
+                    <h1 className="text-5xl font-bold text-primary mb-6">{t2('title')}</h1>
+                    <p className="max-w-5xl mx-auto text-sm md:text-base leading-relaxed whitespace-pre-line">
+                        {t2('detail')}
                     </p>
                 </section>
 
@@ -35,7 +38,7 @@ export default function ContactPage() {
                     {/* แถวที่ 1: คำนำหน้า, ชื่อ, นามสกุล */}
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12 md:col-span-2">
-                            <label className="block text-sm font-bold mb-2">คำนำหน้า</label>
+                            <label className="block text-sm font-bold mb-2">{t2('titleName')}</label>
                             <select className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20">
                                 <option>เลือก</option>
                                 <option>นาย</option>
@@ -44,26 +47,25 @@ export default function ContactPage() {
                             </select>
                         </div>
                         <div className="col-span-12 md:col-span-5">
-                            <label className="block text-sm font-bold mb-2">ชื่อ</label>
-                            <input type="text" placeholder="ชื่อ" className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
+                            <label className="block text-sm font-bold mb-2">{t2('fName')}</label>
+                            <input type="text" placeholder={t2('fName')} required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                         <div className="col-span-12 md:col-span-5">
-                            <label className="block text-sm font-bold mb-2">นามสกุล</label>
-                            <input type="text" placeholder="นามสกุล" className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
+                            <label className="block text-sm font-bold mb-2">{t2('lName')}</label>
+                            <input type="text" placeholder={t2('lName')} required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                     </div>
 
                     {/* แถวที่ 2: อีเมล, เบอร์ติดต่อ */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-bold mb-2">อีเมล</label>
-                            <input type="email" placeholder="you@company.com" className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
+                            <label className="block text-sm font-bold mb-2">{t2('email')}</label>
+                            <input type="email" placeholder="you@company.com" required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold mb-2">เบอร์ติดต่อ</label>
+                            <label className="block text-sm font-bold mb-2">{t2('phone')}</label>
                             <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-                                <div className="bg-gray-50 px-3 flex items-center border-r">TH ▾</div>
-                                <input type="text" placeholder="+66 (0) 00-000-0000" className="w-full p-3 outline-none" />
+                                <input type="text" placeholder="+66 (0) 00-000-0000" required className="w-full p-3 outline-none" />
                             </div>
                         </div>
                     </div>
@@ -74,10 +76,10 @@ export default function ContactPage() {
                             <label className="block text-sm font-bold mb-2">{label}</label>
                             <div className="flex gap-2">
                                 <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-400 text-sm flex items-center bg-white">
-                                    ลากไฟล์และวางที่นี่ หรือคลิกเพื่ออัปโหลดไฟล์ (.pdf)
+                                    {t2('upload')}
                                 </div>
                                 <button type="button" className="bg-gray-100 px-6 py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-200 transition">
-                                    อัปโหลดไฟล์
+                                    {t2('uploadFile')}
                                 </button>
                             </div>
                         </div>
@@ -85,20 +87,20 @@ export default function ContactPage() {
 
                     {/* ข้อความถึงเรา */}
                     <div>
-                        <label className="block text-sm font-bold mb-2">ข้อความถึงเรา</label>
-                        <textarea rows={4} placeholder="พิมพ์ข้อความหรือคำถามเพิ่มเติมที่นี่ (ถ้ามี)" className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                        <label className="block text-sm font-bold mb-2">{t2('message')}</label>
+                        <textarea rows={4} placeholder={t2('messageInput')} className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20"></textarea>
                     </div>
 
                     {/* Consent */}
                     <div className="flex items-center gap-2 text-sm">
                         <input type="checkbox" id="consent" className="w-4 h-4 rounded border-gray-300" />
-                        <label htmlFor="consent" className="text-gray-700">ฉันยอมรับนโยบายความเป็นส่วนตัว</label>
+                        <label htmlFor="consent" className="text-gray-700">{t2('agreement')}</label>
                     </div>
 
                     {/* ปุ่มส่งข้อมูล */}
                     <div className="flex justify-center pt-6">
-                        <button type="submit" className="bg-[#0b0087] text-white px-20 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto">
-                            ยืนยันการส่งข้อมูล
+                        <button type="submit" className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto">
+                            {t2('submit')}
                         </button>
                     </div>
                 </form>

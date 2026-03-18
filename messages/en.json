@@ -13,7 +13,8 @@
         "contact": "Contact Us",
         "address1": "Headquarters Address: 935/7 Moo 14, Sila Sub-district,",
         "address2": "Mueang District, Khon Kaen 40000",
-        "address3": "Phone: (+66) 81 659 0093"
+        "address3": "Phone: (+66) 81 659 0093 (TH Support)",
+        "address4": "Phone / WhatsApp: (+66) 84 403 1518 (EN Support)"
     },
     "Hero": {
         "title": "Bridging Education with\nProfessional Foreign Teachers",
@@ -30,23 +31,83 @@
         "title4": "100% Visa & Document Management",
         "detail4": "Hassle-free documentation. We handle all visas and work permits in one place."
     },
-    "AboutUs" : {
+    "AboutUs": {
         "title": "About Us",
         "detail": "P&K Progressive English Co., Ltd. (PKP) provides comprehensive English language education services. The company specializes in recruiting high-quality native and non-native English-speaking teachers for schools across Thailand. All teachers are carefully selected and trained in teaching methodologies, child psychology, classroom management, and Thai cultural etiquette to ensure an effective and engaging learning experience for students."
     },
     "News": {
         "title": "News & Updates",
-        "more": "Read More"
+        "more": "Read More",
+        "posted": "Posted on"
     },
     "Team": {
         "title": "Our Foreign Teachers",
         "detail": "We connect high-quality foreign teachers with the right schools, paying close attention to every detail—from rigorous selection to 100% comprehensive visa and documentation support. All of our educators undergo training in teaching skills and cultural etiquette to ensure a smooth, effective, and joyful learning experience for both teachers and students. Currently, we have a total of XX foreign teachers.",
-        "executives" : "Executives",
+        "executives": "Executives",
         "coordinators": "Coordinators",
         "legalAdvisor": "Legal Advisor",
+        "legalAdvisorName": "Mr. Thawatchai Lakornthai",
         "trusted": "Trusted by Educational Institutions and Partners",
+        "trustedDetail": "With over 8 years of experience and dedication, PKP has earned the trust of numerous educational institutions and organizations. We are committed to consistently providing and managing high-quality foreign educators, including:",
         "more": "In addition, we provide expert legal consultancy, covering Work Permit applications, Visa applications, and Visa Type conversions for employment. We ensure a hassle-free process and fully protect the rights and benefits of our foreign educators through our comprehensive care.",
         "review": "Reviews from the PKP Family",
-        "reviewdetail": "Your happiness is our priority. Discover the experiences of our international educators within the PKP family. From seamless visa processing to dedicated career support, hear why teachers from around the world trust us to be their partner in education here in Thailand."
+        "reviewdetail": "Your happiness is our priority. Discover the experiences of our international educators within the PKP family. From seamless visa processing to dedicated career support, hear why teachers from around the world trust us to be their partner in education here in Thailand.",
+        "executivesList": [
+            "Mr. Damian Ketsemabom Akuli",
+            "Mrs. Parinda Akuli"
+        ],
+        "coordinatorsList": [
+            "Miss Ploypailin Patiyansupong",
+            "Mrs. Orathai Tatawatorn",
+            "Miss Netinart Paiboonworapisit",
+            "Miss Chanakarn Limtongnoi"
+        ],
+        "schoolsList": [
+            "Kaennakhon Witthayayon School (International Program), Khon Kaen",
+            "Ban Phai School, Khon Kaen",
+            "Nakhon Khon Kaen School, Khon Kaen",
+            "Ubolratana Pittayakom School, Khon Kaen",
+            "Chonnabot Sueksa School, Khon Kaen",
+            "Kham Kaennakhon School, Khon Kaen",
+            "Mancha Sueksa School, Khon Kaen",
+            "11 Schools under the Khon Kaen Provincial Administrative Organization: Ban Nong Siao School, Ban Khu Khat School (Sathit Uppatham), Thaen Sila Thip Sueksa School, Sap Sombun Phittayalai School, Samsung Phittayakhom School, Matthayom Nong Khiat School, Prem Tinsulanonda School, Phrayuen Witthayakhon School, Si Sema Witthaya Soem School, Phuwat Phittayakhom School, and Phisan Punna Witthaya School.",
+            "Anukulnari School, Kalasin",
+            "Kamalasai School, Kalasin",
+            "Khaowong Phittayakhan School, Kalasin",
+            "Muang Suwannaphum School, Roi Et",
+            "Muang Phayalae School, Chaiyaphum",
+            "Kasetsomboon School, Chaiyaphum",
+            "Nadoon Prachasan School, Maha Sarakham",
+            "Phonngam Sueksa School, Sakon Nakhon",
+            "Matthayom Dankhunthot School, Nakhon Ratchasima",
+            "Somdet Phra Nyanasamvara School (Under the Royal Patronage), Yasothon",
+            "Wat Phlong Chang Phueak School, Rayong",
+            "Ban Map Yang Phon School, Rayong",
+            "Anuban Saladeng School, Saraburi",
+            "Thongchai Jaidee Trivitesueksa School, Lopburi",
+            "Thepsatri Rajabhat University Demonstration School, Lopburi (Academic Year 2024, between May - Sep 2024)",
+            "...and many other institutions."
+        ],
+        "honored": "We are honored to have managed English Camp projects and professional development programs for teachers for various organizations, including:",
+        "honoredList": [
+            "Secondary Educational Service Area Office Kalasin (SESAO Kalasin): Organized the 'English Volunteer Camp' project.",
+            "English Camp Organizations for Students at: Chonnabot Sueksa School, Sawatee Pittayasan School, Muang Phayalae School, Khaowong Phittayakhan School, Muang Suwannaphum School, Ubolratana Pittayakom School, and many other institutions.",
+            "Guest Speakers & English Teaching Workshops for government sectors such as Chonnabot Sueksa School and Kamalasai School."
+        ]
+    },
+    "Contact": {
+        "title": "Join Our Team",
+        "detail": "If you have a passion for teaching and are looking for a new experience in Thai schools, we are ready to be your partner. We provide dedicated support, from finding the right school for you to providing close personal care throughout your journey.",
+        "titleName": "Title",
+        "fName": "First Name",
+        "lName": "Last Name",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "upload": "Drag and drop or click to upload (.pdf)",
+        "uploadFile": "Upload File",
+        "message": "Message to Us",
+        "messageInput": "Type your message or additional questions here (optional)",
+        "agreement": "I have read and agree the Privacy Policy.",
+        "submit": "Submit Application"
     }
 }
