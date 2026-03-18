@@ -7,8 +7,8 @@ export default function AboutUs() {
     return (
         <section className="py-20 bg-white">
             <div className="container mx-auto px-4 text-center">
-                <h2 className="text-4xl font-bold text-primary mb-6">{t('title')}</h2>
-                <p className="max-w-7xl mx-auto text-base leading-relaxed mb-12 max-md:text-sm whitespace-pre-line">
+                <h2 className="text-4xl font-bold text-primary mb-6 max-md:text-3xl">{t('title')}</h2>
+                <p className="max-w-7xl mx-auto text-base leading-relaxed mb-12 max-md:text-xs whitespace-pre-line">
                     {t('detail')}
                 </p>
 

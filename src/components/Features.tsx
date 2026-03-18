@@ -5,7 +5,7 @@ export default function Features() {
 
     return (
         <section className="bg-primary py-10 text-white">
-            <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 px-4">
+            <div className="container mx-auto grid grid-cols-4 max-xl:grid-cols-1 gap-8 px-4">
                 <div className="flex gap-4">
                     <div className="w-12 bg-accent shrink-0"></div> {/* ใส่ไอคอนตรงนี้ */}
                     <div>

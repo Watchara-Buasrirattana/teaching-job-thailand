@@ -99,7 +99,7 @@ export default function ContactPage() {
 
                     {/* ปุ่มส่งข้อมูล */}
                     <div className="flex justify-center pt-6">
-                        <button type="submit" className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold shadow-lg hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto">
+                        <button type="submit" disabled className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-gray-300">
                             {t2('submit')}
                         </button>
                     </div>

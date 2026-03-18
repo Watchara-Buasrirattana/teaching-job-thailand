@@ -42,13 +42,13 @@ export default function NewsDetail({ params }: { params: { id: string, locale: s
 
                 {/* 3. รูปภาพหลัก (ใช้ relative + aspect-video) */}
                 <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg mb-10">
-                    <Image
+                    {/* <Image
                         src={news.mainImage}
                         alt={news.title}
                         fill
                         className="object-cover"
                         priority
-                    />
+                    /> */}
                 </div>
 
                 {/* 4. เนื้อหาข่าว */}
@@ -60,12 +60,12 @@ export default function NewsDetail({ params }: { params: { id: string, locale: s
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {news.gallery.map((img, index) => (
                         <div key={index} className="relative aspect-video rounded-lg overflow-hidden shadow-md group">
-                            <Image
+                            {/* <Image
                                 src={img}
                                 alt={`Gallery ${index}`}
                                 fill
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
+                            /> */}
                         </div>
                     ))}
                 </div>

@@ -4,13 +4,17 @@ import TeacherCard from "@/components/TeacherCard";
 import Pagination from "@/components/Pagination";
 import ReviewCard from "@/components/ReviewCard";
 import { useTranslations } from "next-intl";
+import { use } from "react"; // ✅ 1. Import 'use' จาก React
 
 export default function TeamPage({
     searchParams
 }: {
-    searchParams: { page?: string }
+    searchParams: Promise<{ page?: string }> // ✅ 2. เปลี่ยน Type เป็น Promise
 }) {
     const t = useTranslations("Team");
+
+    // ✅ 3. ใช้ use() เพื่อแกะค่าออกจาก Promise ก่อนนำไปใช้
+    const resolvedSearchParams = use(searchParams);
 
     const executivesList = t.raw("executivesList");
     const coordinatorsList = t.raw("coordinatorsList");
@@ -18,8 +22,8 @@ export default function TeamPage({
     const honoredList = t.raw("honoredList");
 
     // --- ส่วนของระบบ Pagination ---
-    const itemsPerPage = 5; // แสดงครู 10 คนต่อหน้า (2 แถวบน Desktop)
-    const currentPage = Number(searchParams.page) || 1;
+    const itemsPerPage = 5; // แสดงครู 5 คนต่อหน้า (2 แถวบน Desktop)
+    const currentPage = Number(resolvedSearchParams.page) || 1; // ✅ เรียกใช้ผ่านตัวที่แกะกล่องแล้ว
 
     // ข้อมูลสมมติ (ในอนาคตดึงจาก Database)
     const allTeachers = Array(7).fill({
@@ -55,11 +59,11 @@ export default function TeamPage({
                     ]}
                 />
 
-                <h1 className="text-5xl font-bold text-primary text-center my-10 max-md:text-3xl">
+                <h1 className="text-5xl font-bold text-primary text-center my-10 max-md:text-3xl max-md:my-5">
                     {t('title')}
                 </h1>
 
-                <p className="max-w-7xl mx-auto text-center mb-12 text-sm md:text-base leading-relaxed">
+                <p className="max-w-7xl mx-auto text-center mb-12 text-sm max-md:text-xs leading-relaxed">
                     {t('detail')}
                 </p>
 
@@ -81,14 +85,14 @@ export default function TeamPage({
                     </div>
                 )}
 
-                <section className="py-12 bg-[#ECF0FF]">
+                <section className="py-12 max-md:py-6">
                     <div className="container mx-auto max-w-7xl px-4">
                         {/* Header */}
                         <div className="text-center mb-12">
                             <h2 className="text-5xl font-bold text-primary mb-6 max-md:text-3xl">
                                 {t('review')}
                             </h2>
-                            <p className="max-w-6xl mx-auto text-sm md:text-base leading-relaxed">
+                            <p className="max-w-6xl mx-auto text-sm max-md:text-xs leading-relaxed">
                                 {t('reviewdetail')}
                             </p>
                         </div>
@@ -103,10 +107,10 @@ export default function TeamPage({
                 </section>
 
                 {/* 2. ส่วนรายชื่อ Executives / Coordinators (ไม่ต้องทำ Pagination) */}
-                <div className="grid grid-cols-3 gap-10 pt-16 max-md:grid-cols-1">
+                <div className="grid grid-cols-3 gap-10 pt-16 max-md:grid-cols-1 max-md:justify-items-center max-md:pt-8">
                     <section>
-                        <h2 className="text-4xl font-bold text-primary mb-6">{t('executives')}</h2>
-                        <ol className="list-decimal pl-5 space-y-2">
+                        <h2 className="text-4xl font-bold text-primary mb-6 max-md:text-3xl">{t('executives')}</h2>
+                        <ol className="list-decimal pl-5 space-y-2 max-md:text-xs">
                             {executivesList.map((name: string, idx: number) => (
                                 <li key={idx}>{name}</li>
                             ))}
@@ -114,10 +118,10 @@ export default function TeamPage({
                     </section>
 
                     <section>
-                        <h2 className="text-4xl font-bold text-primary mb-6">
+                        <h2 className="text-4xl font-bold text-primary mb-6 max-md:text-3xl">
                             {t('coordinators')}
                         </h2>
-                        <ol className="list-decimal pl-5 space-y-2">
+                        <ol className="list-decimal pl-5 space-y-2 max-md:text-xs">
                             {coordinatorsList.map((name: string, idx: number) => (
                                 <li key={idx}>{name}</li>
                             ))}
@@ -125,35 +129,35 @@ export default function TeamPage({
                     </section>
 
                     <section>
-                        <h2 className="text-4xl font-bold text-primary mb-6">
+                        <h2 className="text-4xl font-bold text-primary mb-6 max-md:text-3xl">
                             {t('legalAdvisor')}
                         </h2>
-                        <p className="">
+                        <p className="max-md:text-xs">
                             {t('legalAdvisorName')}
                         </p>
                     </section>
                 </div>
 
                 {/* 3. ส่วนพันธมิตร (Trusted by...) */}
-                <section className="mt-16 pt-16">
+                <section className="mt-16 pt-16 max-md:mt-8 max-md:pt-8">
                     <h2 className="text-4xl font-bold text-primary text-center mb-10 max-md:text-2xl">
                         {t('trusted')}
                     </h2>
-                    <p className="text-center mb-10">
+                    <p className="text-center mb-10 max-md:text-xs">
                         {t('trustedDetail')}
                     </p>
 
                     {/* ✅ ใช้ <ul> กับ list-disc และ pl-5 */}
-                    <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto md:columns-2 gap-20 max-md:columns-1">
+                    <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto md:columns-2 gap-20 max-md:columns-1 max-md:text-xs">
                         {schoolsList.map((school: string, idx: number) => (
                             <li key={idx} className="break-inside-avoid">{school}</li>
                         ))}
                     </ul>
 
-                    <p className="text-center m-10">
+                    <p className="text-center m-10 max-md:text-xs max-md:m-8">
                         {t('honored')}
                     </p>
-                    <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto">
+                    <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto max-md:text-xs">
                         {honoredList.map((honored: string, idx: number) => (
                             <li key={idx} className="break-inside-avoid">
                                 {honored}
@@ -163,8 +167,8 @@ export default function TeamPage({
                 </section>
 
                 {/* แถบสรุปสีเหลืองด้านล่างสุด */}
-                <div className="mt-20 bg-accent p-8 text-center rounded-sm shadow-sm">
-                    <p className="text-primary font-bold max-md:text-sm">
+                <div className="mt-20 bg-accent p-8 text-center rounded-sm shadow-sm max-md:p-4 max-md:mt-10">
+                    <p className="text-primary font-bold max-md:text-[10px]">
                         {t('more')}
                     </p>
                 </div>
