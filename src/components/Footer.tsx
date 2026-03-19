@@ -48,10 +48,10 @@ export default function Footer() {
                     {/* Social Icons */}
                     <div className="flex gap-4 mt-6">
                         {/* ✅ ใส่ Link ครอบ Icon ไว้ เพื่อให้กดไปที่เพจ/แชทได้ และเพิ่ม Effect Hover */}
-                        <Link href="#" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform active:scale-95">
+                        <Link href="https://www.facebook.com/profile.php?id=100063704340759" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform active:scale-95">
                             <FaFacebookMessenger className="w-8 h-8 text-accent"></FaFacebookMessenger>
                         </Link>
-                        <Link href="#" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform active:scale-95">
+                        <Link href="https://www.facebook.com/profile.php?id=100063704340759" target="_blank" rel="noopener noreferrer" className="hover:scale-110 transition-transform active:scale-95">
                             <FaFacebook className="w-8 h-8 text-accent"></FaFacebook>
                         </Link>
                     </div>
