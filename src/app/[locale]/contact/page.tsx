@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react'; // เพิ่ม useRef
 import { Link } from '@/i18n/routing';
 import Breadcrumb from '@/components/Breadcrumb';
 import SuccessModal from '@/components/SuccessModal';
@@ -10,11 +10,42 @@ export default function ContactPage() {
     const t2 = useTranslations("Contact");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false); // เพิ่มสถานะ Loading
+    const [agreement, setAgreement] = useState(false); // ไว้เช็คการติ๊กถูก
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // สร้าง Ref สำหรับไฟล์ (เอาไว้สั่งให้คลิกปุ่มแล้วไปเปิดหน้าเลือกไฟล์)
+    const resumeRef = useRef<HTMLInputElement>(null);
+    const coverLetterRef = useRef<HTMLInputElement>(null);
+    const [resumeName, setResumeName] = useState("");
+    const [coverLetterName, setCoverLetterName] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // ทำ Logic การส่งข้อมูลที่นี่
-        setIsModalOpen(true); // เมื่อส่งสำเร็จให้เปิด Modal
+        setIsSubmitting(true);
+
+        try {
+            const formData = new FormData(e.currentTarget);
+            
+            const res = await fetch('/api/contact', {
+                method: 'POST',
+                body: formData, // ส่งข้อมูลทั้งหมดรวมถึงไฟล์
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                setIsModalOpen(true);
+                e.currentTarget.reset(); // ล้างข้อมูลในฟอร์ม
+                setResumeName("");
+                setCoverLetterName("");
+            } else {
+                alert("เกิดข้อผิดพลาด: " + result.message);
+            }
+        } catch (error) {
+            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -39,20 +70,21 @@ export default function ContactPage() {
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12 md:col-span-2">
                             <label className="block text-sm font-bold mb-2">{t2('titleName')}</label>
-                            <select className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20">
-                                <option>เลือก</option>
-                                <option>นาย</option>
-                                <option>นางสาว</option>
-                                <option>นาง</option>
+                            {/* เพิ่ม name="..." เพื่อให้ FormData ดึงข้อมูลได้ */}
+                            <select name="title" className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20">
+                                <option value="">เลือก</option>
+                                <option value="Mr.">นาย</option>
+                                <option value="Ms.">นางสาว</option>
+                                <option value="Mrs.">นาง</option>
                             </select>
                         </div>
                         <div className="col-span-12 md:col-span-5">
                             <label className="block text-sm font-bold mb-2">{t2('fName')}</label>
-                            <input type="text" placeholder={t2('fName')} required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
+                            <input name="firstName" type="text" placeholder={t2('fName')} required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                         <div className="col-span-12 md:col-span-5">
                             <label className="block text-sm font-bold mb-2">{t2('lName')}</label>
-                            <input type="text" placeholder={t2('lName')} required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
+                            <input name="lastName" type="text" placeholder={t2('lName')} required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                     </div>
 
@@ -60,53 +92,96 @@ export default function ContactPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-bold mb-2">{t2('email')}</label>
-                            <input type="email" placeholder="you@company.com" required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
+                            <input name="email" type="email" placeholder="you@company.com" required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                         <div>
                             <label className="block text-sm font-bold mb-2">{t2('phone')}</label>
-                            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-                                <input type="text" placeholder="+66 (0) 00-000-0000" required className="w-full p-3 outline-none" />
-                            </div>
+                            <input name="phone" type="text" placeholder="+66 (0) 00-000-0000" required className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" />
                         </div>
                     </div>
 
-                    {/* ส่วนอัปโหลดไฟล์ */}
-                    {['Resume', 'Cover Letter'].map((label) => (
-                        <div key={label}>
-                            <label className="block text-sm font-bold mb-2">{label}</label>
-                            <div className="flex gap-2">
-                                <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-400 text-sm flex items-center bg-white">
-                                    {t2('upload')}
-                                </div>
-                                <button type="button" className="bg-gray-100 px-6 py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-200 transition">
-                                    {t2('uploadFile')}
-                                </button>
+                    {/* ส่วนอัปโหลดไฟล์ Resume */}
+                    <div>
+                        <label className="block text-sm font-bold mb-2">Resume (PDF)</label>
+                        <input 
+                            type="file" 
+                            name="resume" 
+                            ref={resumeRef} 
+                            accept=".pdf" 
+                            className="hidden" 
+                            onChange={(e) => setResumeName(e.target.files?.[0]?.name || "")}
+                            required
+                        />
+                        <div className="flex gap-2">
+                            <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-500 text-sm flex items-center bg-gray-50">
+                                {resumeName || t2('upload')}
                             </div>
+                            <button 
+                                type="button" 
+                                onClick={() => resumeRef.current?.click()}
+                                className="bg-gray-100 px-6 py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-200 transition"
+                            >
+                                {t2('uploadFile')}
+                            </button>
                         </div>
-                    ))}
+                    </div>
+
+                    {/* ส่วนอัปโหลดไฟล์ Cover Letter */}
+                    <div>
+                        <label className="block text-sm font-bold mb-2">Cover Letter (PDF)</label>
+                        <input 
+                            type="file" 
+                            name="coverLetter" 
+                            ref={coverLetterRef} 
+                            accept=".pdf" 
+                            className="hidden" 
+                            onChange={(e) => setCoverLetterName(e.target.files?.[0]?.name || "")}
+                        />
+                        <div className="flex gap-2">
+                            <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-500 text-sm flex items-center bg-gray-50">
+                                {coverLetterName || t2('upload')}
+                            </div>
+                            <button 
+                                type="button" 
+                                onClick={() => coverLetterRef.current?.click()}
+                                className="bg-gray-100 px-6 py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-200 transition"
+                            >
+                                {t2('uploadFile')}
+                            </button>
+                        </div>
+                    </div>
 
                     {/* ข้อความถึงเรา */}
                     <div>
                         <label className="block text-sm font-bold mb-2">{t2('message')}</label>
-                        <textarea rows={4} placeholder={t2('messageInput')} className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                        <textarea name="message" rows={4} placeholder={t2('messageInput')} className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20"></textarea>
                     </div>
 
                     {/* Consent */}
                     <div className="flex items-center gap-2 text-sm">
-                        <input type="checkbox" id="consent" className="w-4 h-4 rounded border-gray-300" />
-                        <label htmlFor="consent" className="text-gray-700">{t2('agreement')}</label>
+                        <input 
+                            type="checkbox" 
+                            id="consent" 
+                            checked={agreement}
+                            onChange={(e) => setAgreement(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 cursor-pointer" 
+                        />
+                        <label htmlFor="consent" className="text-gray-700 cursor-pointer">{t2('agreement')}</label>
                     </div>
 
                     {/* ปุ่มส่งข้อมูล */}
                     <div className="flex justify-center pt-6">
-                        <button type="submit" disabled className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:hover:bg-gray-300">
-                            {t2('submit')}
+                        <button 
+                            type="submit" 
+                            disabled={!agreement || isSubmitting} 
+                            className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? "Sending..." : t2('submit')}
                         </button>
                     </div>
                 </form>
             </div>
 
-            {/* Modal แจ้งเตือน */}
             <SuccessModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
         </main>
     );
