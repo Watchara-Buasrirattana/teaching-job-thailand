@@ -4,12 +4,13 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "mysql"
+  url = env("DATABASE_URL")
 }
 
 // ตารางข่าวสาร
@@ -58,7 +59,7 @@ model ApplicationForm {
   lastName    String
   email       String
   phone       String
-  resumeUrl   String
+  resumeUrl   String?
   coverLetter String?
   message     String?  @db.Text
   createdAt   DateTime @default(now())

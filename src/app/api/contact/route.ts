@@ -1,7 +1,7 @@
 // app/api/contact/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile } from 'fs/promises';
+import { writeFile, mkdir } from 'fs/promises'; // 👈 เพิ่ม mkdir ตรงนี้
 import path from 'path';
 
 export async function POST(request: Request) {
@@ -21,11 +21,17 @@ export async function POST(request: Request) {
         let resumePath = "";
 
         if (resumeFile) {
+            // 👇 โค้ดส่วนที่เพิ่มมาใหม่: เช็คและสร้างโฟลเดอร์ uploads ถ้ายังไม่มี
+            const uploadDir = path.join(process.cwd(), "public/uploads");
+            await mkdir(uploadDir, { recursive: true });
+
             const buffer = Buffer.from(await resumeFile.arrayBuffer());
             const filename = Date.now() + "_" + resumeFile.name.replaceAll(" ", "_");
-            await writeFile(path.join(process.cwd(), "public/uploads/" + filename), buffer);
-            resumePath = "/uploads/" + filename; // เก็บ path ไว้ลง DB
+            await writeFile(path.join(uploadDir, filename), buffer);
+            resumePath = "/uploads/" + filename;
         }
+
+        // (ถ้ามี Cover Letter ด้วย ก็ใช้วิธีเดียวกันนี้ได้เลยครับ)
 
         // 3. บันทึกลง Database
         const newEntry = await prisma.applicationForm.create({
@@ -35,7 +41,7 @@ export async function POST(request: Request) {
                 lastName,
                 email,
                 phone,
-                resumeUrl: resumePath, // บันทึกตำแหน่งไฟล์
+                resumeUrl: resumePath,
                 message: message || "",
             }
         });
