@@ -99,15 +99,21 @@
         "title": "Join Our Team",
         "detail": "If you have a passion for teaching and are looking for a new experience in Thai schools, we are ready to be your partner. We provide dedicated support, from finding the right school for you to providing close personal care throughout your journey.",
         "titleName": "Title",
+        "select": "Select",
+        "mr": "Mr.",
+        "miss": "Miss",
+        "mrs": "Mrs.",
         "fName": "First Name",
         "lName": "Last Name",
         "email": "Email Address",
         "phone": "Phone Number",
         "upload": "Drag and drop or click to upload (.pdf)",
         "uploadFile": "Upload File",
+        "errorResume": "Please attach your Resume before submitting.",
+        "errorAgreement": "Please agree to the Privacy Policy.",
         "message": "Message to Us",
         "messageInput": "Type your message or additional questions here (optional)",
         "agreement": "I have read and agree the Privacy Policy.",
-        "submit": "Temporarily Unavailable"
+        "submit": "Submit Application"
     }
 }

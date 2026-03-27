@@ -1,38 +1,54 @@
 import NewsCard from "@/components/NewsCard";
 import Pagination from "@/components/Pagination";
 import Breadcrumb from "@/components/Breadcrumb";
-import { useTranslations } from "next-intl";
+import { getTranslations, getLocale } from "next-intl/server";
+import prisma from "@/lib/prisma";
 
-// ✅ รับ searchParams เพื่ออ่านค่าหน้าจาก URL (เช่น ?page=2)
-export default function NewsPage({ 
+export default async function NewsPage({ 
     searchParams 
 }: { 
     searchParams: { page?: string } 
 }) {
-    const t = useTranslations("News");
-    const t2 = useTranslations("Navbar");
+    // ใช้ next-intl/server เพื่อดึงภาษาปัจจุบัน (th หรือ en)
+    const locale = await getLocale(); 
+    const t = await getTranslations("News");
+    const t2 = await getTranslations("Navbar");
 
     // 1. ตั้งค่าการแบ่งหน้า
-    const itemsPerPage = 8; // แสดง 8 ข่าวต่อหน้า
+    const itemsPerPage = 8;
     const currentPage = Number(searchParams.page) || 1;
 
-    // 2. ข้อมูลสมมติ (รวมทั้งหมด)
-    const allNews = [
-        { id: "1", title: "ข่าวที่ 1", detail: "รายละเอียดข่าว...", date: "13/03/2569", img: "/pic1.png" },
-        { id: "2", title: "ข่าวที่ 2", detail: "รายละเอียดข่าว...", date: "12/03/2569", img: "/pic2.png" },
-        { id: "3", title: "ข่าวที่ 3", detail: "รายละเอียดข่าว...", date: "11/03/2569", img: "/pic3.png" },
-        { id: "4", title: "ข่าวที่ 4", detail: "รายละเอียดข่าว...", date: "10/03/2569", img: "/pic4.png" },
-        // เพิ่มข้อมูลให้เยอะพอสำหรับการแบ่งหน้า...
-    ];
+    // 2. นับจำนวนข่าวทั้งหมดที่เป็น "Published" เพื่อทำ Pagination
+    const totalNews = await prisma.news.count({
+        where: { status: 'Published' }
+    });
+    const totalPages = Math.ceil(totalNews / itemsPerPage);
 
-    // 3. คำนวณหาจำนวนหน้าทั้งหมด
-    const totalPages = Math.ceil(allNews.length / itemsPerPage);
+    // 3. ดึงข้อมูลจาก Database ตามหน้าปัจจุบัน
+    const dbNews = await prisma.news.findMany({
+        where: { status: 'Published' },
+        orderBy: { createdAt: 'desc' }, // เรียงข่าวใหม่ล่าสุดขึ้นก่อน
+        skip: (currentPage - 1) * itemsPerPage,
+        take: itemsPerPage,
+    });
 
-    // 4. ตัดข้อมูลเพื่อแสดงเฉพาะหน้าปัจจุบัน
-    const displayedNews = allNews.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
+    // 4. แปลงข้อมูลจาก DB ให้เข้ากับรูปแบบของ NewsCard และกรองตามภาษา
+    const displayedNews = dbNews.map((item) => {
+        // เลือกหัวข้อและรายละเอียดตามภาษา
+        const title = locale === 'th' ? item.headlineTh : item.headlineEn;
+        const detail = locale === 'th' ? item.bodyTh : item.bodyEn;
+        
+        return {
+            id: item.id.toString(),
+            title: title || "Untitled",
+            // ตัดข้อความรายละเอียดให้สั้นลง (ตัวอย่าง: เอาแค่ 100 ตัวอักษร)
+            detail: detail ? detail.substring(0, 100) + "..." : "",
+            date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            }),
+            img: item.featuredImage || "/placeholder.jpg" // ถ้ารูปไม่มีให้ใส่รูปสำรอง
+        };
+    });
 
     return (
         <main className="min-h-screen bg-white pb-20 font-prompt">
@@ -51,21 +67,19 @@ export default function NewsPage({
 
             {/* News Grid */}
             <div className="container mx-auto max-w-7xl px-4">
-                {/* ถ้าไม่มีข่าวในหน้านี้เลย */}
                 {displayedNews.length === 0 ? (
                     <div className="text-center py-20 text-gray-400">
-                        No news available in this page.
+                        {locale === 'th' ? 'ยังไม่มีข่าวสารในขณะนี้' : 'No news available.'}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-4 gap-6 mb-16 max-md:grid-cols-1">
+                    <div className="grid grid-cols-4 gap-6 mb-16 max-md:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                         {displayedNews.map((item) => (
                             <NewsCard key={item.id} {...item} />
                         ))}
                     </div>
                 )}
 
-                {/* Pagination ส่วนล่าง */}
-                {/* ✅ ส่งค่า totalPages ไปให้ Component */}
+                {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="mt-4 flex justify-center">
                         <Pagination totalPages={totalPages} />

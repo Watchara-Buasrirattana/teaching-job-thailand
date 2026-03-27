@@ -1,74 +1,102 @@
+// src/app/[locale]/news/[id]/page.tsx
 import Image from "next/image";
-import { Link } from "@/i18n/routing";
 import Breadcrumb from "@/components/Breadcrumb";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
+import prisma from "@/lib/prisma";
 
-export default function NewsDetail({ params }: { params: { id: string, locale: string } }) {
-    const t = useTranslations('Navbar');
-    const t2 = useTranslations('News');
-    // ในอนาคตใช้ params.id ไปดึงข้อมูลจาก API หรือไฟล์ JSON
-    const news = {
-        title: "PKP ร่วมจัดกิจกรรม \"English Camp 2026\" มุ่งทักษะภาษาอังกฤษ สร้างความกล้าแสดงออกให้เยาวชน",
-        date: "03/03/2569",
-        content: `โรงเรียนเมืองสุวรรณภูมิได้จัดโครงการค่ายทักษะภาษาอังกฤษ หรือ "English Camp 2026" เพื่อส่งเสริมการเรียนรู้นอกห้องเรียน... (เนื้อหาเต็มของคุณ)`,
-        mainImage: "/news-main.jpg",
-        gallery: ["/news-1.jpg", "/news-2.jpg", "/news-3.jpg", "/news-4.jpg"]
-    };
+// ✅ แก้ไข Type ของ params ให้เป็น Promise
+export default async function NewsDetail({
+    params
+}: {
+    params: Promise<{ id: string, locale: string }>
+}) {
+    // 1. 👉 ดึงค่า id และ locale ออกมาจาก params ด้วย await (สำคัญมากสำหรับ Next.js 15+)
+    const { id, locale } = await params;
 
+    const t = await getTranslations('Navbar');
+    const t2 = await getTranslations('News');
+
+    // 2. ดึงข้อมูลจาก Database ตาม ID และเช็คว่าเป็นตัวเลขหรือไม่
+    const newsItem = await prisma.news.findUnique({
+        where: {
+            id: id // เพราะเราเปลี่ยน id ใน Prisma เป็น String ที่ใช้ UUID แล้ว
+        }
+    });
+
+    // 3. ถ้าหาข่าวไม่เจอ หรือข่าวนั้นยังไม่ Publish ให้แสดงหน้า 404
+    if (!newsItem || newsItem.status !== 'Published') {
+        notFound();
+    }
+
+    // 4. จัดการแสดงผลตามภาษา (Locale)
+    const isThai = locale === 'th';
+    const title = isThai ? newsItem.headlineTh : newsItem.headlineEn;
+    const content = isThai ? newsItem.bodyTh : newsItem.bodyEn;
+    const date = new Date(newsItem.createdAt).toLocaleDateString(isThai ? 'th-TH' : 'en-US', {
+        year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    const mainImage = newsItem.featuredImage || "/placeholder.jpg";
+    // แปลงข้อมูล JSON จาก DB ให้เป็น Array ของ String
+    const gallery = (newsItem.galleryImages as string[]) || [];
 
     return (
         <main className="min-h-screen bg-white pb-20 font-prompt">
-            {/* 1. Breadcrumb (หน้าแรก > ข่าว > ชื่อข่าว) */}
             <div className="container mx-auto max-w-6xl px-4 py-6 text-sm flex gap-2 items-center">
                 <Breadcrumb
                     paths={[
                         { label: t('home'), href: "/" },
                         { label: t('news'), href: "/news" },
-                        { label: news.title } // หน้าปัจจุบัน
+                        { label: title || "News Detail" }
                     ]}
                 />
             </div>
 
             <div className="container mx-auto px-4 max-w-6xl">
-                {/* 2. หัวข้อข่าวและวันที่ */}
+                {/* หัวข้อข่าวและวันที่ */}
                 <div className="mb-8">
-                    <div className="flex gap-4 items-start">
-                        <h1 className="text-3xl md:text-4xl font-bold text-primary leading-tight">
-                            {news.title}
-                        </h1>
+                    <h1 className="text-3xl md:text-4xl font-bold text-primary leading-tight">
+                        {title}
+                    </h1>
+                    <p className="text-gray-400 text-sm mt-4">{t2('posted')} {date}</p>
+                </div>
+
+                {/* รูปภาพหลัก */}
+                {mainImage && (
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg mb-10 bg-gray-100">
+                        <Image
+                            src={mainImage}
+                            alt={title || "News Image"}
+                            fill
+                            className="object-cover"
+                            priority
+                            sizes="(max-width: 1280px) 100vw, 1280px"
+                        />
                     </div>
-                    <p className="text-gray-400 text-sm mt-4">{t2('posted')} {news.date}</p>
-                </div>
+                )}
 
-                {/* 3. รูปภาพหลัก (ใช้ relative + aspect-video) */}
-                <div className="relative w-full aspect-video rounded-xl overflow-hidden shadow-lg mb-10">
-                    {/* <Image
-                        src={news.mainImage}
-                        alt={news.title}
-                        fill
-                        className="object-cover"
-                        priority
-                    /> */}
-                </div>
-
-                {/* 4. เนื้อหาข่าว */}
+                {/* เนื้อหาข่าว */}
                 <article className="text-gray-700 leading-relaxed text-lg mb-16 whitespace-pre-line">
-                    {news.content}
+                    {content}
                 </article>
 
-                {/* 5. Gallery รูปประกอบด้านล่าง */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {news.gallery.map((img, index) => (
-                        <div key={index} className="relative aspect-video rounded-lg overflow-hidden shadow-md group">
-                            {/* <Image
-                                src={img}
-                                alt={`Gallery ${index}`}
-                                fill
-                                className="object-cover group-hover:scale-110 transition-transform duration-500"
-                            /> */}
-                        </div>
-                    ))}
-                </div>
+                {/* Gallery รูปประกอบด้านล่าง */}
+                {gallery.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+                        {gallery.map((img, index) => (
+                            <div key={index} className="relative aspect-video rounded-lg overflow-hidden shadow-md group bg-gray-100">
+                                <Image
+                                    src={img}
+                                    alt={`Gallery ${index + 1}`}
+                                    fill
+                                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                    sizes="(max-width: 768px) 50vw, 25vw"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </main>
     );

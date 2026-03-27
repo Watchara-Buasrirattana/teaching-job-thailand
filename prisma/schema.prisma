@@ -5,23 +5,25 @@
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "mysql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 // ตารางข่าวสาร
 model News {
-  id        Int      @id @default(autoincrement())
-  titleTh   String
-  titleEn   String
-  detailTh  String   @db.Text
-  detailEn  String   @db.Text
-  image     String? // รูปภาพใช้ตัวเดียวกันทั้ง 2 ภาษา
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  headlineTh    String
+  headlineEn    String
+  bodyTh        String?  @db.Text
+  bodyEn        String?  @db.Text
+  featuredImage String // เก็บ path ของรูปปก
+  galleryImages Json? // เก็บ Array ของ path รูปแกลลอรี่ (สูงสุด 4 รูป)
+  status        String   @default("Draft") // Published หรือ Draft
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Review {
@@ -59,7 +61,7 @@ model ApplicationForm {
   lastName    String
   email       String
   phone       String
-  resumeUrl   String?
+  resumeUrl   String
   coverLetter String?
   message     String?  @db.Text
   createdAt   DateTime @default(now())
@@ -68,8 +70,8 @@ model ApplicationForm {
 model Admin {
   id        Int      @id @default(autoincrement())
   username  String   @unique
-  password  String   // เก็บเป็น Hash (รหัสที่ถูกเข้ารหัสแล้ว)
-  name      String?  // ชื่อเรียกของ Admin
+  password  String // เก็บเป็น Hash (รหัสที่ถูกเข้ารหัสแล้ว)
+  name      String? // ชื่อเรียกของ Admin
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

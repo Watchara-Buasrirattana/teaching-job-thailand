@@ -1,7 +1,7 @@
 // app/api/contact/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises'; // 👈 เพิ่ม mkdir ตรงนี้
+import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
 export async function POST(request: Request) {
@@ -18,7 +18,10 @@ export async function POST(request: Request) {
 
         // 2. จัดการไฟล์ Resume
         const resumeFile = formData.get('resume') as File;
+        const coverLetterFile = formData.get('coverLetter') as File;
         let resumePath = "";
+        let coverLetterPath = "";
+
 
         if (resumeFile) {
             // 👇 โค้ดส่วนที่เพิ่มมาใหม่: เช็คและสร้างโฟลเดอร์ uploads ถ้ายังไม่มี
@@ -29,6 +32,17 @@ export async function POST(request: Request) {
             const filename = Date.now() + "_" + resumeFile.name.replaceAll(" ", "_");
             await writeFile(path.join(uploadDir, filename), buffer);
             resumePath = "/uploads/" + filename;
+        }
+
+        if (coverLetterFile) {
+            // 👇 โค้ดส่วนที่เพิ่มมาใหม่: เช็คและสร้างโฟลเดอร์ uploads ถ้ายังไม่มี
+            const uploadDir = path.join(process.cwd(), "public/uploads");
+            await mkdir(uploadDir, { recursive: true });
+
+            const buffer = Buffer.from(await coverLetterFile.arrayBuffer());
+            const filename = Date.now() + "_" + coverLetterFile.name.replaceAll(" ", "_");
+            await writeFile(path.join(uploadDir, filename), buffer);
+            coverLetterPath = "/uploads/" + filename;
         }
 
         // (ถ้ามี Cover Letter ด้วย ก็ใช้วิธีเดียวกันนี้ได้เลยครับ)
@@ -42,6 +56,7 @@ export async function POST(request: Request) {
                 email,
                 phone,
                 resumeUrl: resumePath,
+                coverLetter: coverLetterPath,
                 message: message || "",
             }
         });
