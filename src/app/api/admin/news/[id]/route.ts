@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
+import { logAdminAction } from '@/lib/logger';
+import { cookies } from 'next/headers';
 
 // --- UPDATE NEWS ---
 export async function PUT(
@@ -9,11 +11,22 @@ export async function PUT(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = await params; // 👉 1. รับ id มาเป็น String ตรงๆ ได้เลย (ไม่ต้องมี idString แล้ว)
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('admin_token')?.value;
+        
+        // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
+        if (!adminToken) {
+            return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+        }
+        
+        // แปลงค่าจาก Cookie (String) กลับเป็นตัวเลข (Int)
+        const currentAdminId = parseInt(adminToken);
+
+        const { id } = await params;
         
         const formData = await request.formData();
         
-        // 👉 2. ใช้ id ที่เป็น String ค้นหา
+        // ใช้ id ที่เป็น String ค้นหา
         const oldNews = await prisma.news.findUnique({ where: { id } });
         if (!oldNews) return NextResponse.json({ success: false, message: "News not found" }, { status: 404 });
 
@@ -69,12 +82,20 @@ export async function PUT(
 
         // --- 3. บันทึกลง Database ---
         const updatedNews = await prisma.news.update({
-            where: { id }, // 👉 3. ใช้ id (String) บันทึก
+            where: { id },
             data: { 
                 headlineTh, headlineEn, bodyTh, bodyEn, status, 
                 featuredImage: featuredImagePath,
                 galleryImages: finalGallery 
             }
+        });
+
+        await logAdminAction({
+            adminId: currentAdminId,
+            action: "UPDATE",
+            entity: "News",
+            entityId: updatedNews.id,
+            details: `แก้ไขข่าว: ${updatedNews.headlineTh}`
         });
 
         return NextResponse.json({ success: true, data: updatedNews });
@@ -90,12 +111,23 @@ export async function DELETE(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = await params; // 👉 1. รับ id มาเป็น String ตรงๆ
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('admin_token')?.value;
+        
+        // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
+        if (!adminToken) {
+            return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+        }
+        
+        // แปลงค่าจาก Cookie (String) กลับเป็นตัวเลข (Int)
+        const currentAdminId = parseInt(adminToken);
 
-        const news = await prisma.news.findUnique({ where: { id } }); // 👉 2. ค้นหาด้วย id (String)
+        const { id } = await params;
+
+        const news = await prisma.news.findUnique({ where: { id } }); // ค้นหาด้วย id (String)
         if (!news) return NextResponse.json({ success: false, message: "Not found" });
 
-        await prisma.news.delete({ where: { id } }); // 👉 3. ลบด้วย id (String)
+        await prisma.news.delete({ where: { id } }); // ลบด้วย id (String)
 
         const deleteFile = async (p: string) => {
             try { await unlink(path.join(process.cwd(), "public", p)); } catch (e) {}
@@ -104,6 +136,14 @@ export async function DELETE(
         if (news.featuredImage) await deleteFile(news.featuredImage);
         const gallery = (news.galleryImages as string[]) || [];
         for (const img of gallery) await deleteFile(img);
+
+        await logAdminAction({
+            adminId: currentAdminId, 
+            action: "DELETE",
+            entity: "News",
+            entityId: id,
+            details: `ลบข่าว: ${news.headlineTh || news.headlineEn}`
+        });
 
         return NextResponse.json({ success: true });
     } catch (error) {

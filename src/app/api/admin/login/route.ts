@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { cookies } from 'next/headers'; // นำเข้า cookies
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
     try {
@@ -16,10 +16,9 @@ export async function POST(request: Request) {
 
         // ฝาก Cookie ชื่อ 'admin_token' ไว้ (ในระบบจริงควรใช้ JWT ที่เข้ารหัส)
         // การตั้ง httpOnly: true จะทำให้ JavaScript ฝั่ง Client แอบอ่านค่านี้ไม่ได้ (ปลอดภัยจาก Hacker)
-        (await cookies()).set('admin_token', 'authenticated_true', {
+        (await cookies()).set('admin_token', admin.id.toString(), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            // maxAge: 60 * 60 * 24, // (ถ้าต้องการให้ Cookie หมดอายุหลัง 1 วัน)
             path: '/',
         });
 

@@ -4,13 +4,13 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { getTranslations, getLocale } from "next-intl/server";
 import prisma from "@/lib/prisma";
 
-export default async function NewsPage({ 
-    searchParams 
-}: { 
-    searchParams: { page?: string } 
+export default async function NewsPage({
+    searchParams
+}: {
+    searchParams: { page?: string }
 }) {
     // ใช้ next-intl/server เพื่อดึงภาษาปัจจุบัน (th หรือ en)
-    const locale = await getLocale(); 
+    const locale = await getLocale();
     const t = await getTranslations("News");
     const t2 = await getTranslations("Navbar");
 
@@ -34,14 +34,20 @@ export default async function NewsPage({
 
     // 4. แปลงข้อมูลจาก DB ให้เข้ากับรูปแบบของ NewsCard และกรองตามภาษา
     const displayedNews = dbNews.map((item) => {
-        // เลือกหัวข้อและรายละเอียดตามภาษา
-        const title = locale === 'th' ? item.headlineTh : item.headlineEn;
-        const detail = locale === 'th' ? item.bodyTh : item.bodyEn;
-        
+        // ถ้ายูสเซอร์อยู่หน้าเว็บภาษาไทย: เอา TH ขึ้นก่อน ถ้าไม่มีให้ใช้ EN
+        // ถ้ายูสเซอร์อยู่หน้าเว็บภาษาอังกฤษ: เอา EN ขึ้นก่อน ถ้าไม่มีให้ใช้ TH
+        const title = locale === 'th'
+            ? (item.headlineTh || item.headlineEn)
+            : (item.headlineEn || item.headlineTh);
+
+        const detail = locale === 'th'
+            ? (item.bodyTh || item.bodyEn)
+            : (item.bodyEn || item.bodyTh);
+
         return {
             id: item.id.toString(),
             title: title || "Untitled",
-            // ตัดข้อความรายละเอียดให้สั้นลง (ตัวอย่าง: เอาแค่ 100 ตัวอักษร)
+            // ตัดข้อความรายละเอียดให้สั้นลง
             detail: detail ? detail.substring(0, 100) + "..." : "",
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'

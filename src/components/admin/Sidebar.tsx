@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MdOutlineSpaceDashboard, MdContentCopy, MdLogout } from 'react-icons/md';
+import { MdOutlineSpaceDashboard, MdContentCopy, MdLogout, MdOutlineHistory } from 'react-icons/md';
 import { BiUserPlus, BiGroup } from 'react-icons/bi';
 import { FaRegCommentAlt } from 'react-icons/fa';
 
@@ -15,6 +15,7 @@ export default function Sidebar() {
         { name: 'Applicants', icon: BiUserPlus, path: '/admin/applicants' },
         { name: 'Teachers', icon: BiGroup, path: '/admin/teachers' },
         { name: 'Reviews', icon: FaRegCommentAlt, path: '/admin/reviews' },
+        { name: 'Activity Log', icon: MdOutlineHistory, path: '/admin/log' },
     ];
 
     // เปลี่ยนจาก document.cookie เป็นการเรียก API
@@ -31,7 +32,7 @@ export default function Sidebar() {
     };
 
     return (
-        <aside className="w-64 bg-[#0A0A8B] text-white min-h-screen flex flex-col font-prompt fixed">
+        <aside className="w-64 bg-primary text-white min-h-screen flex flex-col font-prompt fixed">
             {/* Logo Area */}
             <div className="h-24 flex items-center justify-center border-b border-white/10 p-4">
                 <div className="text-center">
@@ -48,7 +49,7 @@ export default function Sidebar() {
                     return (
                         <Link key={item.name} href={item.path}>
                             <div className={`flex items-center gap-4 px-4 py-3 rounded-lg cursor-pointer transition-all ${isActive
-                                ? 'bg-[#FFC107] text-[#0A0A8B] font-bold shadow-md'
+                                ? 'bg-accent text-primary font-bold shadow-md'
                                 : 'text-gray-300 hover:bg-white/10 hover:text-white'
                                 }`}>
                                 <Icon size={24} />
@@ -60,7 +61,7 @@ export default function Sidebar() {
             </nav>
 
             {/* User Profile & Logout */}
-            <div className="bg-[#F3F4F6] text-[#0A0A8B] p-4 flex items-center justify-between">
+            <div className="bg-[#F3F4F6] text-primary p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center overflow-hidden">
                         {/* รูป Avatar จำลอง */}
@@ -71,7 +72,7 @@ export default function Sidebar() {
                         <p className="text-xs text-gray-500">Admin</p>
                     </div>
                 </div>
-                <button onClick={handleLogout} className="text-[#0A0A8B] hover:text-red-600 transition p-2">
+                <button onClick={handleLogout} className="text-primary hover:text-red-600 transition p-2">
                     <MdLogout size={24} />
                 </button>
             </div>
