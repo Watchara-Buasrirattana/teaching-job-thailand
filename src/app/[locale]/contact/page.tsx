@@ -196,14 +196,25 @@ export default function ContactPage() {
 
                     {/* ปุ่มส่งข้อมูล */}
                     <div className="flex justify-center pt-6">
-                        <button
-                            type="submit"
-                            disabled={!agreement || isSubmitting}
-                            className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                        >
-                            {isSubmitting ? "Sending..." : t2('submit')}
-                        </button>
+                        <div className={`relative group w-full md:w-auto ${(!agreement || isSubmitting) ? 'cursor-not-allowed' : ''}`}>
+
+                            <button
+                                type="submit"
+                                disabled={!agreement || isSubmitting}
+                                className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:pointer-events-none"
+                            >
+                                {isSubmitting ? t2('sending') : t2('submit')}
+                            </button>
+
+                            {(!agreement || isSubmitting) && (
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 hidden group-hover:block w-max bg-gray-800 text-white text-sm py-2 px-4 rounded-lg shadow-xl z-10">
+                                    {!agreement ? t2('agreementRequired') : t2('sending')}
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-800"></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
+
                 </form>
             </div>
 

@@ -64,6 +64,7 @@ model ApplicationForm {
   resumeUrl   String
   coverLetter String?
   message     String?  @db.Text
+  status      String   @default("New") // New, Under Review, Trainee, Teacher, Rejected
   createdAt   DateTime @default(now())
 }
 

@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { FiSearch, FiTrash2, FiEdit, FiPlus, FiX, FiCheck, FiAlertTriangle } from 'react-icons/fi';
 
-export default function ContentPage() {
+export default function NewsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newsList, setNewsList] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);

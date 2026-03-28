@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { MdOutlineSpaceDashboard, MdContentCopy, MdLogout, MdOutlineHistory } from 'react-icons/md';
 import { BiUserPlus, BiGroup } from 'react-icons/bi';
 import { FaRegCommentAlt } from 'react-icons/fa';
@@ -8,6 +9,7 @@ import { FaRegCommentAlt } from 'react-icons/fa';
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
+    const [adminName, setAdminName] = useState("Loading...");
 
     const menuItems = [
         { name: 'Dashboard', icon: MdOutlineSpaceDashboard, path: '/admin/dashboard' },
@@ -17,6 +19,27 @@ export default function Sidebar() {
         { name: 'Reviews', icon: FaRegCommentAlt, path: '/admin/reviews' },
         { name: 'Activity Log', icon: MdOutlineHistory, path: '/admin/log' },
     ];
+
+    useEffect(() => {
+        const fetchAdminData = async () => {
+            try {
+                const res = await fetch('/api/admin/me');
+                const result = await res.json();
+                
+                if (result.success) {
+                    // โชว์ Name ถ้ามี หรือถ้าไม่มีให้โชว์ Username แทน
+                    setAdminName(result.data.name || result.data.username);
+                } else {
+                    setAdminName("Unknown Admin");
+                }
+            } catch (error) {
+                console.error("Failed to fetch admin data", error);
+                setAdminName("Error");
+            }
+        };
+
+        fetchAdminData();
+    }, []);
 
     // เปลี่ยนจาก document.cookie เป็นการเรียก API
     const handleLogout = async () => {
@@ -68,7 +91,7 @@ export default function Sidebar() {
                         <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Admin" alt="avatar" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold">Username</p>
+                        <p className="text-sm font-bold truncate uppercase">{adminName}</p>
                         <p className="text-xs text-gray-500">Admin</p>
                     </div>
                 </div>

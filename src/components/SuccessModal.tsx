@@ -1,5 +1,6 @@
 "use client";
 import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 interface SuccessModalProps {
     isOpen: boolean;
@@ -7,6 +8,7 @@ interface SuccessModalProps {
 }
 
 export default function SuccessModal({ isOpen, onClose }: SuccessModalProps) {
+    const t = useTranslations("NotFound");
     if (!isOpen) return null;
 
     return (
@@ -25,17 +27,16 @@ export default function SuccessModal({ isOpen, onClose }: SuccessModalProps) {
                     </div>
                 </div>
 
-                <h2 className="text-4xl font-bold text-primary mb-4">ส่งข้อมูลเรียบร้อยแล้ว!</h2>
+                <h2 className="text-4xl font-bold text-primary mb-4">{t("successTitle")}</h2>
                 <p className="text-gray-600 mb-8 leading-relaxed">
-                    ส่งข้อมูลเรียบร้อยแล้ว ทีมงานได้รับเรซูเม่ของคุณแล้ว<br />
-                    และจะติดต่อกลับโดยเร็วที่สุด
+                    {t("successMessage")}
                 </p>
 
                 <Link
                     href="/"
                     className="inline-block bg-primary text-white px-10 py-3 rounded-full text-lg font-bold hover:bg-blue-900 transition-all"
                 >
-                    กลับสู่หน้าหลัก
+                    {t("backHome")}
                 </Link>
             </div>
         </div>

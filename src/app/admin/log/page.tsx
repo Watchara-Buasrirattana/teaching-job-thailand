@@ -12,8 +12,9 @@ export default async function ActivityLogPage() {
     });
 
     return (
+
         <div className="p-6 font-prompt">
-            <h1 className="text-2xl font-bold text-[#0A0A8B] mb-6">Activity Logs</h1>
+            <h1 className="text-2xl font-bold text-primary mb-6">Activity Logs</h1>
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 border-b text-gray-500">
@@ -25,6 +26,7 @@ export default async function ActivityLogPage() {
                         </tr>
                     </thead>
                     <tbody>
+                        
                         {logs.map((log) => (
                             <tr key={log.id} className="border-b hover:bg-gray-50 transition">
                                 <td className="p-4 font-bold">{log.admin?.name || log.admin?.username}</td>
