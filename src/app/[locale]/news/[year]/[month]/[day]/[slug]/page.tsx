@@ -1,38 +1,46 @@
-// src/app/[locale]/news/[id]/page.tsx
+// src/app/[locale]/news/[year]/[month]/[day]/[slug]/page.tsx
 import Image from "next/image";
 import Breadcrumb from "@/components/Breadcrumb";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 
-// ✅ แก้ไข Type ของ params ให้เป็น Promise
+// แก้ไข Type ของ params ให้เป็น Promise
 export default async function NewsDetail({
     params
 }: {
-    params: Promise<{ id: string, locale: string }>
+    params: Promise<{ year: string, month: string, day: string, slug: string, locale: string }>
 }) {
-    // 1. 👉 ดึงค่า id และ locale ออกมาจาก params ด้วย await (สำคัญมากสำหรับ Next.js 15+)
-    const { id, locale } = await params;
+    // ดึงค่า id และ locale ออกมาจาก params ด้วย await (สำคัญมากสำหรับ Next.js 15+)
+    const { year, month, day, slug, locale } = await params;
+
+    // ถอดรหัส URL ภาษาไทยให้กลับมาเป็นคำอ่านปกติ
+    const decodedSlug = decodeURIComponent(slug);
 
     const t = await getTranslations('Navbar');
     const t2 = await getTranslations('News');
 
-    // 2. ดึงข้อมูลจาก Database ตาม ID และเช็คว่าเป็นตัวเลขหรือไม่
+    // ดึงข้อมูลจาก Database ตาม ID และเช็คว่าเป็นตัวเลขหรือไม่
     const newsItem = await prisma.news.findUnique({
         where: {
-            id: id // เพราะเราเปลี่ยน id ใน Prisma เป็น String ที่ใช้ UUID แล้ว
+            slug: decodedSlug
         }
     });
 
-    // 3. ถ้าหาข่าวไม่เจอ หรือข่าวนั้นยังไม่ Publish ให้แสดงหน้า 404
+    // ถ้าหาข่าวไม่เจอ หรือข่าวนั้นยังไม่ Publish ให้แสดงหน้า 404
     if (!newsItem || newsItem.status !== 'Published') {
         notFound();
     }
 
-    // 4. จัดการแสดงผลตามภาษา (Locale)
+    // จัดการแสดงผลตามภาษา (Locale)
     const isThai = locale === 'th';
-    const title = isThai ? newsItem.headlineTh : newsItem.headlineEn;
-    const content = isThai ? newsItem.bodyTh : newsItem.bodyEn;
+    const title = isThai 
+        ? (newsItem.headlineTh || newsItem.headlineEn) 
+        : (newsItem.headlineEn || newsItem.headlineTh);
+        
+    const content = isThai 
+        ? (newsItem.bodyTh || newsItem.bodyEn) 
+        : (newsItem.bodyEn || newsItem.bodyTh);
     const date = new Date(newsItem.createdAt).toLocaleDateString(isThai ? 'th-TH' : 'en-US', {
         year: 'numeric', month: 'long', day: 'numeric'
     });

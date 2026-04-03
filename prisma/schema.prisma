@@ -15,6 +15,7 @@ datasource db {
 // ตารางข่าวสาร
 model News {
   id            String   @id @default(uuid())
+  slug          String   @unique
   headlineTh    String
   headlineEn    String
   bodyTh        String?  @db.Text
@@ -30,28 +31,36 @@ model Review {
   id        Int      @id @default(autoincrement())
   teacherId String
   teacher   Teacher  @relation(fields: [teacherId], references: [id])
-  titleTh   String
-  titleEn   String
-  contentTh String   @db.Text
-  contentEn String   @db.Text
+  title     String
+  content   String   @db.Text
   rating    Int      @default(5)
   status    Boolean  @default(true)
   createdAt DateTime @default(now())
 }
 
 model Teacher {
-  id            String   @id @default(uuid())
-  fNameTh       String
-  lNameTh       String
-  fNameEn       String
-  lNameEn       String
-  nationalityTh String
-  nationalityEn String
-  image         String
-  status        Boolean  @default(true)
-  review        Review[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                   String    @id @default(uuid())
+  title                String? // คำนำหน้า (Mr., Ms., Mrs., ฯลฯ)
+  fName                String // ชื่อ (ใน UI เป็น Full Name แต่ขอแยกเก็บ fName/lName เพื่อให้ค้นหาง่ายขึ้น)
+  lName                String
+  country              String? // สัญชาติ/ประเทศ (ตาม UI คือ Country)
+  image                String? // รูปภาพ
+  schoolProject        String? // โรงเรียน / โครงการที่สังกัด
+  phone                String?
+  email                String?
+  passportNumber       String?
+  visaExpiryDate       DateTime? // วันหมดอายุ Visa
+  workPermitNumber     String?
+  workPermitExpiryDate DateTime? // วันหมดอายุ Work Permit
+  status               String    @default("Active") // "Active", "Processing", "Warning", "Urgent"
+  docReady             Boolean   @default(false) // เตรียมเอกสาร (Ready)
+  docSigned            Boolean   @default(false) // สังกัดเซ็นแล้ว (Signed)
+  docSubmitted         Boolean   @default(false) // ยื่นแล้ว (Submitted)
+  docCompleted         Boolean   @default(false) // รับเล่มคืน (Completed)
+  docNote              String?   @db.Text // Note การดำเนินการ
+  review               Review[]
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model ApplicationForm {
@@ -70,21 +79,21 @@ model ApplicationForm {
 
 model ActivityLog {
   id        String   @id @default(uuid())
-  adminId   Int 
+  adminId   Int
   admin     Admin    @relation(fields: [adminId], references: [id])
-  action    String 
-  entity    String 
-  entityId  String 
-  details   String?  
+  action    String
+  entity    String
+  entityId  String
+  details   String?
   createdAt DateTime @default(now())
 }
 
 model Admin {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique
-  password     String
-  name         String?
-  logs         ActivityLog[]
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id        Int           @id @default(autoincrement())
+  username  String        @unique
+  password  String
+  name      String?
+  logs      ActivityLog[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }

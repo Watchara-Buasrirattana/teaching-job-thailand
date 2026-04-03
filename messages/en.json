@@ -45,6 +45,7 @@
     "Team": {
         "title": "Our Foreign Teachers",
         "detail": "We connect high-quality foreign teachers with the right schools, paying close attention to every detail—from rigorous selection to 100% comprehensive visa and documentation support. All of our educators undergo training in teaching skills and cultural etiquette to ensure a smooth, effective, and joyful learning experience for both teachers and students. Currently, we have a total of XX foreign teachers.",
+        "noDataTeacher": "No teacher data available at the moment",
         "executives": "Executives",
         "coordinators": "Coordinators",
         "legalAdvisor": "Legal Advisor",

@@ -5,17 +5,28 @@ import { useTranslations } from "next-intl";
 
 interface NewsCardProps {
     id: string;
+    slug: string;           // 👈 1. เพิ่ม slug
+    createdAt: Date | string; // 👈 2. เพิ่มวันที่สร้าง (เพื่อเอามาดึง ปี/เดือน/วัน)
     title: string;
     detail: string;
     date: string;
     img: string;
 }
 
-export default function NewsCard({ id, title, detail, date, img }: NewsCardProps) {
+export default function NewsCard({ id, slug, createdAt, title, detail, date, img }: NewsCardProps) {
     const t2 = useTranslations('News');
+
+    // 👉 3. คำนวณ URL ให้เป็นรูปแบบ /news/year/month/day/slug
+    const createdDate = new Date(createdAt);
+    const year = createdDate.getFullYear();
+    const month = createdDate.getMonth() + 1; // ใน JS เดือนเริ่มที่ 0 เลยต้อง +1
+    const day = createdDate.getDate();
+    
+    const newsUrl = `/news/${year}/${month}/${day}/${slug}`;
+
     return (
         <Link 
-            href={`/news/${id}`} 
+            href={newsUrl} // 👈 4. เปลี่ยนมาใช้ตัวแปร newsUrl ที่เราประกอบเสร็จแล้ว
             className="group block bg-primary overflow-hidden shadow-sm hover:shadow-xl transition-all border-b-4 border-primary"
         >
             <div className="relative aspect-video w-full overflow-hidden">

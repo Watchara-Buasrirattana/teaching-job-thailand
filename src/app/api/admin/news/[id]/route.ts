@@ -19,9 +19,6 @@ export async function PUT(
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
         
-        // แปลงค่าจาก Cookie (String) กลับเป็นตัวเลข (Int)
-        const currentAdminId = parseInt(adminToken);
-
         const { id } = await params;
         
         const formData = await request.formData();
@@ -91,7 +88,7 @@ export async function PUT(
         });
 
         await logAdminAction({
-            adminId: currentAdminId,
+            adminId: parseInt(adminToken),
             action: "UPDATE",
             entity: "News",
             entityId: updatedNews.id,
@@ -118,10 +115,6 @@ export async function DELETE(
         if (!adminToken) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
-        
-        // แปลงค่าจาก Cookie (String) กลับเป็นตัวเลข (Int)
-        const currentAdminId = parseInt(adminToken);
-
         const { id } = await params;
 
         const news = await prisma.news.findUnique({ where: { id } }); // ค้นหาด้วย id (String)
@@ -138,7 +131,7 @@ export async function DELETE(
         for (const img of gallery) await deleteFile(img);
 
         await logAdminAction({
-            adminId: currentAdminId, 
+            adminId: parseInt(adminToken),
             action: "DELETE",
             entity: "News",
             entityId: id,

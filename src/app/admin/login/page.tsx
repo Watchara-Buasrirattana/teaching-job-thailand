@@ -37,11 +37,11 @@ export default function AdminLoginPage() {
     };
 
     return (
-        <main className="min-h-screen bg-[#E5E7EB] flex items-center justify-center font-prompt p-4">
+        <main className="min-h-screen bg-[#EFEFEF] flex items-center justify-center font-prompt p-4">
             <div className="bg-white p-10 rounded-xl shadow-sm w-full max-w-md">
                 {/* Icon ฟันเฟืองสีเหลือง */}
                 <div className="flex justify-center mb-6">
-                    <div className="text-[#FBBF24]">
+                    <div className="text-accent">
                         <Settings size={80} strokeWidth={1.5} />
                     </div>
                 </div>
@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-[#00008B] text-white py-3 rounded-full text-lg font-bold hover:bg-blue-900 transition-all active:scale-95 disabled:bg-gray-400 mt-4"
+                        className="w-full bg-primary text-white py-3 rounded-full text-lg font-bold cursor-pointer hover:bg-blue-900 transition-all active:scale-95 disabled:bg-gray-400 mt-4"
                     >
                         {loading ? 'Logging in...' : 'Login'}
                     </button>

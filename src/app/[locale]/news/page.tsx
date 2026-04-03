@@ -34,8 +34,7 @@ export default async function NewsPage({
 
     // 4. แปลงข้อมูลจาก DB ให้เข้ากับรูปแบบของ NewsCard และกรองตามภาษา
     const displayedNews = dbNews.map((item) => {
-        // ถ้ายูสเซอร์อยู่หน้าเว็บภาษาไทย: เอา TH ขึ้นก่อน ถ้าไม่มีให้ใช้ EN
-        // ถ้ายูสเซอร์อยู่หน้าเว็บภาษาอังกฤษ: เอา EN ขึ้นก่อน ถ้าไม่มีให้ใช้ TH
+        
         const title = locale === 'th'
             ? (item.headlineTh || item.headlineEn)
             : (item.headlineEn || item.headlineTh);
@@ -46,8 +45,9 @@ export default async function NewsPage({
 
         return {
             id: item.id.toString(),
+            slug: item.slug,
+            createdAt: item.createdAt,
             title: title || "Untitled",
-            // ตัดข้อความรายละเอียดให้สั้นลง
             detail: detail ? detail.substring(0, 100) + "..." : "",
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'

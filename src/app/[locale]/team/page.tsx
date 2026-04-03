@@ -3,40 +3,45 @@ import Breadcrumb from "@/components/Breadcrumb";
 import TeacherCard from "@/components/TeacherCard";
 import Pagination from "@/components/Pagination";
 import ReviewCard from "@/components/ReviewCard";
-import { useTranslations } from "next-intl";
-import { use } from "react"; // ✅ 1. Import 'use' จาก React
+import { getTranslations } from "next-intl/server"; // ✅ เปลี่ยนมาใช้ตัวนี้สำหรับ Server Component
+import prisma from "@/lib/prisma"; // ✅ Import Prisma
 
-export default function TeamPage({
+// ✅ เปลี่ยนเป็น async function
+export default async function TeamPage({
     searchParams
 }: {
-    searchParams: Promise<{ page?: string }> // ✅ 2. เปลี่ยน Type เป็น Promise
+    searchParams: Promise<{ page?: string }>
 }) {
-    const t = useTranslations("Team");
+    const t = await getTranslations("Team"); // ✅ ใช้ await
 
-    // ✅ 3. ใช้ use() เพื่อแกะค่าออกจาก Promise ก่อนนำไปใช้
-    const resolvedSearchParams = use(searchParams);
+    // ✅ ใช้ await แกะค่าแทน use()
+    const resolvedSearchParams = await searchParams;
 
     const executivesList = t.raw("executivesList");
     const coordinatorsList = t.raw("coordinatorsList");
     const schoolsList = t.raw("schoolsList");
     const honoredList = t.raw("honoredList");
 
-    // --- ส่วนของระบบ Pagination ---
-    const itemsPerPage = 5; // แสดงครู 5 คนต่อหน้า (2 แถวบน Desktop)
-    const currentPage = Number(resolvedSearchParams.page) || 1; // ✅ เรียกใช้ผ่านตัวที่แกะกล่องแล้ว
+    // --- ส่วนของระบบ Pagination และดึงข้อมูลจริง ---
+    const itemsPerPage = 5; 
+    const currentPage = Number(resolvedSearchParams.page) || 1;
 
-    // ข้อมูลสมมติ (ในอนาคตดึงจาก Database)
-    const allTeachers = Array(7).fill({
-        name: "Name - Surname",
-        nationality: "Nationality"
+    // 1. นับจำนวนครูทั้งหมดที่มีสถานะ Active
+    const totalTeachers = await prisma.teacher.count({
+        where: { status: 'Active' } // ดึงเฉพาะคนที่ Active
+    });
+    
+    const totalPages = Math.ceil(totalTeachers / itemsPerPage);
+
+    // 2. ดึงข้อมูลครูจาก Database
+    const displayedTeachers = await prisma.teacher.findMany({
+        where: { status: 'Active' },
+        orderBy: { createdAt: 'desc' }, // เอาคนล่าสุดขึ้นก่อน
+        skip: (currentPage - 1) * itemsPerPage,
+        take: itemsPerPage,
     });
 
-    const totalPages = Math.ceil(allTeachers.length / itemsPerPage);
-    const displayedTeachers = allTeachers.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
-    );
-
+    // ข้อมูลจำลองสำหรับรีวิว (คงไว้ตามที่คุณแจ้ง)
     const reviews = [
         {
             title: "มีความเป็นมืออาชีพและไม่ต้องกังวลเรื่องเอกสาร!",
@@ -45,7 +50,7 @@ export default function TeamPage({
             country: "สหรัฐอเมริกา",
             image: "/teacher.png"
         },
-        // ก๊อปปี้เพิ่มให้ครบ 6 อันตามรูป
+        // (สามารถเพิ่ม ReviewCard เพิ่มเติมตรงนี้ได้)
     ];
     // ----------------------------
 
@@ -67,16 +72,23 @@ export default function TeamPage({
                     {t('detail')}
                 </p>
 
-                {/* 1. ส่วนแสดงการ์ดครู (ที่มี Pagination) */}
-                <div className="grid grid-cols-5 gap-4 mb-10 max-md:grid-cols-2">
-                    {displayedTeachers.map((teacher, index) => (
-                        <TeacherCard
-                            key={index}
-                            name={teacher.name}
-                            nationality={teacher.nationality}
-                        />
-                    ))}
-                </div>
+                {/* 1. ส่วนแสดงการ์ดครู */}
+                {displayedTeachers.length === 0 ? (
+                    <div className="text-center py-10 text-gray-400">
+                        {t('noDataTeacher')}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-5 gap-4 mb-10 max-md:grid-cols-2">
+                        {displayedTeachers.map((teacher) => (
+                            <TeacherCard
+                                key={teacher.id}
+                                img={teacher.image || '/placeholder-avatar.jpg'} // 👉 ส่งรูปภาพถ้ามี ถ้าไม่มีใช้ placeholder
+                                name={`${teacher.title || ''} ${teacher.fName} ${teacher.lName}`.trim()}
+                                country={teacher.country || ''}
+                            />
+                        ))}
+                    </div>
+                )}
 
                 {/* ปุ่มควบคุมหน้า (แสดงเฉพาะเมื่อมีมากกว่า 1 หน้า) */}
                 {totalPages > 1 && (
@@ -106,7 +118,7 @@ export default function TeamPage({
                     </div>
                 </section>
 
-                {/* 2. ส่วนรายชื่อ Executives / Coordinators (ไม่ต้องทำ Pagination) */}
+                {/* 2. ส่วนรายชื่อ Executives / Coordinators */}
                 <div className="grid grid-cols-3 gap-10 pt-16 max-md:grid-cols-1 max-md:justify-items-center max-md:pt-8">
                     <section>
                         <h2 className="text-4xl font-bold text-primary mb-6 max-md:text-3xl">{t('executives')}</h2>
@@ -147,7 +159,6 @@ export default function TeamPage({
                         {t('trustedDetail')}
                     </p>
 
-                    {/* ✅ ใช้ <ul> กับ list-disc และ pl-5 */}
                     <ul className="list-disc pl-5 space-y-3 max-w-6xl mx-auto md:columns-2 gap-20 max-md:columns-1 max-md:text-xs">
                         {schoolsList.map((school: string, idx: number) => (
                             <li key={idx} className="break-inside-avoid">{school}</li>

@@ -1,12 +1,14 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { FiSearch, FiTrash2, FiEdit, FiPlus, FiX, FiCheck, FiAlertTriangle } from 'react-icons/fi';
+import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 
 export default function NewsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newsList, setNewsList] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [sortConfig, setSortConfig] = useState<{ key: string, direction: 'asc' | 'desc' | null }>({ key: '', direction: null });
 
     // เปลี่ยน editId เป็น string (UUID)
     const [editId, setEditId] = useState<string | null>(null);
@@ -52,6 +54,41 @@ export default function NewsPage() {
     useEffect(() => {
         fetchNews();
     }, []);
+
+    // ฟังก์ชันจัดเรียงข้อมูลตามคอลัมน์ที่กด
+    const sortedNewsList = useMemo(() => {
+        let sortableItems = [...newsList];
+        if (sortConfig.direction !== null && sortConfig.key !== '') {
+            sortableItems.sort((a, b) => {
+                let aValue = a[sortConfig.key] || '';
+                let bValue = b[sortConfig.key] || '';
+
+                // กรณีเรียงตามชื่อข่าว (ให้เช็คภาษาไทยก่อน ถ้าไม่มีค่อยเอาอังกฤษ)
+                if (sortConfig.key === 'title') {
+                    aValue = (a.headlineTh || a.headlineEn || '').toLowerCase();
+                    bValue = (b.headlineTh || b.headlineEn || '').toLowerCase();
+                }
+
+                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        return sortableItems;
+    }, [newsList, sortConfig]);
+
+    const requestSort = (key: string) => {
+        let direction: 'asc' | 'desc' | null = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+        else if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIcon = (columnKey: string) => {
+            if (sortConfig.key !== columnKey || sortConfig.direction === null) return <FaSort className="text-gray-300 ml-1 inline" />;
+            if (sortConfig.direction === 'asc') return <FaSortUp className="text-primary ml-1 inline" />;
+            return <FaSortDown className="text-primary ml-1 inline" />;
+        };
 
     // 2. รีเซ็ตฟอร์ม
     const resetForm = () => {
@@ -219,20 +256,20 @@ export default function NewsPage() {
                         <thead className="text-gray-400 border-b bg-gray-50/50">
                             <tr>
                                 <th className="py-3 px-4 font-normal w-20">Preview</th>
-                                <th className="py-3 px-4 font-normal">Headline</th>
-                                <th className="py-3 px-4 font-normal">Date</th>
+                                <th className="py-3 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('title')}>Name {getSortIcon('title')}</th>
+                                <th className="py-3 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('createdAt')}>Date {getSortIcon('createdAt')}</th>
                                 <th className="py-3 px-4 font-normal">Language</th>
-                                <th className="py-3 px-4 font-normal">Status</th>
+                                <th className="py-3 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('status')}>Status {getSortIcon('status')}</th>
                                 <th className="py-3 px-4 font-normal text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {isLoading ? (
                                 <tr><td colSpan={5} className="text-center py-10 text-gray-500">Loading...</td></tr>
-                            ) : newsList.length === 0 ? (
+                            ) : sortedNewsList.length === 0 ? (
                                 <tr><td colSpan={5} className="text-center py-10 text-gray-500">No news found.</td></tr>
                             ) : (
-                                newsList.map((news) => (
+                                sortedNewsList.map((news) => (
                                     <tr key={news.id} className="border-b border-gray-50 hover:bg-blue-50/50">
                                         <td className="py-3 px-4">
                                             {news.featuredImage ? (
@@ -255,8 +292,8 @@ export default function NewsPage() {
 
                                                 {/* ถ้ามีหัวข้อภาษาอังกฤษ ให้โชว์ป้าย EN */}
                                                 <span className={`font-bold px-2 py-2 rounded border ${news.headlineEn
-                                                        ? 'bg-primary text-white border-primary' // สีทึบน้ำเงิน (มีข้อมูล)
-                                                        : 'bg-transparent text-gray-400 border-gray-300' // สีโปร่งเทาจางๆ (ไม่มีข้อมูล)
+                                                    ? 'bg-primary text-white border-primary' // สีทึบน้ำเงิน (มีข้อมูล)
+                                                    : 'bg-transparent text-gray-400 border-gray-300' // สีโปร่งเทาจางๆ (ไม่มีข้อมูล)
                                                     }`}>
                                                     EN
                                                 </span>

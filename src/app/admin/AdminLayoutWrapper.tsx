@@ -13,7 +13,7 @@ export default function AdminLayoutWrapper({ children }: { children: React.React
 
     // ถ้าเป็นหน้าอื่นๆ ใน Admin ให้โชว์ Sidebar ตามปกติ
     return (
-        <div className="flex font-prompt bg-[#F3F4F6] text-gray-800 antialiased min-h-screen">
+        <div className="flex font-prompt bg-[#EFEFEF] text-gray-800 antialiased min-h-screen">
             <Sidebar />
             <main className="flex-1 ml-64 p-8">
                 {children}
