@@ -200,7 +200,7 @@ export default function ContactPage() {
 
                             <button
                                 type="submit"
-                                disabled={!agreement || isSubmitting}
+                                disabled={true} //{!agreement || isSubmitting}
                                 className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:pointer-events-none"
                             >
                                 {isSubmitting ? t2('sending') : t2('submit')}

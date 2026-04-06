@@ -69,7 +69,7 @@ export default async function TeamPage({
                 </h1>
 
                 <p className="max-w-7xl mx-auto text-center mb-12 text-sm max-md:text-xs leading-relaxed">
-                    {t('detail')}
+                    {t('detail', { count: totalTeachers })}
                 </p>
 
                 {/* 1. ส่วนแสดงการ์ดครู */}

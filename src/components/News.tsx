@@ -21,13 +21,15 @@ export default async function News() {
         const detail = locale === 'th' ? item.bodyTh : item.bodyEn;
 
         return {
-            id: item.id, // ใช้ UUID string จาก DB
+            id: item.id,
+            slug: item.slug,
+            createdAt: item.createdAt,
             title: title || "Untitled",
             detail: detail ? detail.substring(0, 100) + "..." : "", // ตัดข้อความให้สั้นลง
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             }),
-            img: item.featuredImage || "/placeholder.jpg" // ถ้ารูปไม่มีให้ใส่รูปสำรอง
+            img: item.featuredImage || "/placeholder.png" // ถ้ารูปไม่มีให้ใส่รูปสำรอง
         };
     });
 
