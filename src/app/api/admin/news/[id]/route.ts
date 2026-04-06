@@ -1,30 +1,36 @@
+// src/app/api/admin/news/[id]/route.ts
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { writeFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
+import { db } from '@/lib/db';
+import { news } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 // --- UPDATE NEWS ---
 export async function PUT(
-    request: Request, 
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
-        
+
         // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
         if (!adminToken) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
-        
+
         const { id } = await params;
-        
+
         const formData = await request.formData();
-        
-        // ใช้ id ที่เป็น String ค้นหา
-        const oldNews = await prisma.news.findUnique({ where: { id } });
+
+        const [oldNews] = await db
+            .select()
+            .from(news)
+            .where(eq(news.id, id))
+            .limit(1);
         if (!oldNews) return NextResponse.json({ success: false, message: "News not found" }, { status: 404 });
 
         // ... โค้ดรับข้อมูล (headline, body, status) เหมือนเดิม ...
@@ -43,7 +49,7 @@ export async function PUT(
 
         if (featuredFile && featuredFile.size > 0) {
             if (oldNews.featuredImage) {
-                try { await unlink(path.join(process.cwd(), "public", oldNews.featuredImage)); } catch (e) {}
+                try { await unlink(path.join(process.cwd(), "public", oldNews.featuredImage)); } catch (e) { }
             }
             const buffer = Buffer.from(await featuredFile.arrayBuffer());
             const filename = `featured_${Date.now()}_${featuredFile.name.replaceAll(" ", "_")}`;
@@ -59,12 +65,12 @@ export async function PUT(
         const oldGallery = (oldNews.galleryImages as string[]) || [];
         const imagesToDelete = oldGallery.filter(img => !keptGallery.includes(img));
         for (const img of imagesToDelete) {
-            try { await unlink(path.join(process.cwd(), "public", img)); } catch (e) {}
+            try { await unlink(path.join(process.cwd(), "public", img)); } catch (e) { }
         }
 
         const newGalleryPaths: string[] = [];
         const galleryFiles = formData.getAll('galleryImages') as File[];
-        
+
         for (let i = 0; i < galleryFiles.length; i++) {
             const file = galleryFiles[i];
             if (file && file.size > 0) {
@@ -77,25 +83,39 @@ export async function PUT(
 
         const finalGallery = [...keptGallery, ...newGalleryPaths];
 
-        // --- 3. บันทึกลง Database ---
-        const updatedNews = await prisma.news.update({
-            where: { id },
-            data: { 
-                headlineTh, headlineEn, bodyTh, bodyEn, status, 
+        // บันทึกลง Database
+        await db.update(news)
+            .set({ 
+                headlineTh, 
+                headlineEn, 
+                bodyTh, 
+                bodyEn, 
+                status, 
                 featuredImage: featuredImagePath,
                 galleryImages: finalGallery 
-            }
-        });
+            })
+            .where(eq(news.id, id));
 
         await logAdminAction({
             adminId: parseInt(adminToken),
             action: "UPDATE",
             entity: "News",
-            entityId: updatedNews.id,
-            details: `แก้ไขข่าว: ${updatedNews.headlineTh}`
+            entityId : id,
+            details: `แก้ไขข่าว: ${headlineTh}`
         });
 
-        return NextResponse.json({ success: true, data: updatedNews });
+        const updatedNewsData = {
+            id,
+            headlineTh, 
+            headlineEn, 
+            bodyTh, 
+            bodyEn, 
+            status, 
+            featuredImage: featuredImagePath,
+            galleryImages: finalGallery
+        };
+
+        return NextResponse.json({ success: true, data: updatedNewsData });
     } catch (error) {
         console.error("PUT Error:", error);
         return NextResponse.json({ success: false, message: "Update failed" }, { status: 500 });
@@ -104,30 +124,34 @@ export async function PUT(
 
 // --- DELETE NEWS ---
 export async function DELETE(
-    request: Request, 
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
-        
+
         // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
         if (!adminToken) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
         const { id } = await params;
 
-        const news = await prisma.news.findUnique({ where: { id } }); // ค้นหาด้วย id (String)
-        if (!news) return NextResponse.json({ success: false, message: "Not found" });
+        const [existingNews] = await db
+            .select()
+            .from(news)
+            .where(eq(news.id, id))
+            .limit(1);
+        if (!existingNews) return NextResponse.json({ success: false, message: "Not found" });
 
-        await prisma.news.delete({ where: { id } }); // ลบด้วย id (String)
+        await db.delete(news).where(eq(news.id, id));
 
         const deleteFile = async (p: string) => {
-            try { await unlink(path.join(process.cwd(), "public", p)); } catch (e) {}
+            try { await unlink(path.join(process.cwd(), "public", p)); } catch (e) { }
         };
 
-        if (news.featuredImage) await deleteFile(news.featuredImage);
-        const gallery = (news.galleryImages as string[]) || [];
+        if (existingNews.featuredImage) await deleteFile(existingNews.featuredImage);
+        const gallery = (existingNews.galleryImages as string[]) || [];
         for (const img of gallery) await deleteFile(img);
 
         await logAdminAction({
@@ -135,7 +159,7 @@ export async function DELETE(
             action: "DELETE",
             entity: "News",
             entityId: id,
-            details: `ลบข่าว: ${news.headlineTh || news.headlineEn}`
+            details: `ลบข่าว: ${existingNews.headlineTh || existingNews.headlineEn}`
         });
 
         return NextResponse.json({ success: true });

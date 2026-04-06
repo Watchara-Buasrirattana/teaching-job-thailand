@@ -1,17 +1,23 @@
+// src/app/api/admin/news/route.ts
 import { logAdminAction } from '@/lib/logger';
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { cookies } from 'next/headers';
+import { db } from '@/lib/db'; // 👈 นำเข้า db
+import { news } from '@/db/schema'; // 👈 นำเข้า schema
+import { desc } from 'drizzle-orm'; // 👈 นำเข้าฟังก์ชันจัดเรียง
 
 // ดึงข้อมูลข่าวทั้งหมด
 export async function GET() {
     try {
-        const news = await prisma.news.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
-        return NextResponse.json({ success: true, data: news });
+        // 👈 เปลี่ยนจาก prisma เป็น Drizzle
+        const newsList = await db
+            .select()
+            .from(news)
+            .orderBy(desc(news.createdAt));
+            
+        return NextResponse.json({ success: true, data: newsList });
     } catch (error) {
         return NextResponse.json({ success: false, message: "Error fetching news" }, { status: 500 });
     }
@@ -59,37 +65,32 @@ export async function POST(request: Request) {
         let baseSlug = "untitled";
 
         if (headlineEn) {
-            // ถ้ามีชื่อภาษาอังกฤษ ให้แปลงชื่อภาษาอังกฤษเป็น URL
             baseSlug = headlineEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
         } else if (headlineTh) {
-            // ถ้าไม่มีภาษาอังกฤษ ให้ลองดึง "เฉพาะ" ตัวอักษรภาษาอังกฤษและตัวเลขจากชื่อไทย
             const engKeywords = headlineTh.match(/[a-zA-Z0-9]+/g);
-
             if (engKeywords && engKeywords.length > 0) {
-                // ถ้าดึงคำภาษาอังกฤษได้ (เช่นเจอ PKP, English, Camp, 2026) เอามาต่อด้วย -
                 baseSlug = engKeywords.join('-').toLowerCase();
             } else {
-                // ถ้าไม่มีภาษาอังกฤษปนอยู่เลย ให้เอาชื่อภาษาไทยมาทำ URL (รองรับภาษาไทย ก-ฮ)
-                // ลบตัวอักษรพิเศษออก เหลือแค่ ก-ฮ, ตัวเลข, และช่องว่าง แล้วเปลี่ยนช่องว่างเป็น -
                 baseSlug = headlineTh.replace(/[^\w\sก-๙]/g, '').trim().replace(/\s+/g, '-');
             }
         }
 
-        // ป้องกันกรณี Slug ซ้ำกันด้วยการสุ่มตัวเลขต่อท้าย
         const uniqueSlug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
 
-        // บันทึกลง Database
-        const newNews = await prisma.news.create({
-            data: {
-                headlineTh,
-                headlineEn,
-                slug: uniqueSlug,
-                bodyTh,
-                bodyEn,
-                featuredImage: featuredImagePath,
-                galleryImages: galleryPaths, // บันทึกเป็น JSON array
-                status: status || 'Draft'
-            }
+        // 👈 สร้าง ID ขึ้นมาเองก่อน เพื่อเอาไปบันทึกและเอาไปทำ Log
+        const newId = crypto.randomUUID();
+
+        // 👈 บันทึกลง Database ด้วย Drizzle
+        await db.insert(news).values({
+            id: newId,
+            headlineTh,
+            headlineEn,
+            slug: uniqueSlug,
+            bodyTh,
+            bodyEn,
+            featuredImage: featuredImagePath,
+            galleryImages: galleryPaths, 
+            status: status || 'Draft'
         });
 
         // จด Log การทำงาน
@@ -100,12 +101,22 @@ export async function POST(request: Request) {
                 adminId: parseInt(adminToken),
                 action: "CREATE",
                 entity: "News",
-                entityId: newNews.id,
+                entityId: newId, // 👈 ใช้ newId ที่สร้างไว้
                 details: `เพิ่มข่าวใหม่: ${headlineTh || headlineEn || "Untitled"}`
             });
         }
 
-        return NextResponse.json({ success: true, data: newNews }, { status: 201 });
+        // 👈 สร้าง Object ส่งกลับไปให้หน้าบ้านรับรู้
+        const newNewsData = {
+            id: newId,
+            headlineTh,
+            headlineEn,
+            slug: uniqueSlug,
+            featuredImage: featuredImagePath,
+            status: status || 'Draft'
+        };
+
+        return NextResponse.json({ success: true, data: newNewsData }, { status: 201 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ success: false, message: "Error saving news" }, { status: 500 });

@@ -1,24 +1,33 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import NewsCard from "@/components/NewsCard";
-import prisma from "@/lib/prisma"; // 👉 Import Prisma เข้ามา
+import { db } from "@/lib/db"; // 👉 1. Import db ของ Drizzle
+import { news } from "@/db/schema"; // 👉 2. Import schema ตาราง news
+import { eq, desc } from "drizzle-orm"; // 👉 3. Import ฟังก์ชันเงื่อนไขและการจัดเรียง
 
 export default async function News() {
     // 1. ดึงฟังก์ชันแปลภาษาและภาษาปัจจุบันของหน้าเว็บ
     const t = await getTranslations("News");
     const locale = await getLocale();
 
-    // 2. ดึงข่าวล่าสุดจาก Database 4 ข่าว (เฉพาะที่ Publish แล้ว)
-    const dbNews = await prisma.news.findMany({
-        where: { status: 'Published' },
-        orderBy: { createdAt: 'desc' }, // เรียงจากใหม่ไปเก่า
-        take: 4, // ดึงมาแสดงแค่ 4 ข่าวล่าสุด
-    });
+    // 2. 👉 ดึงข่าวล่าสุดจาก Database 4 ข่าว (เฉพาะที่ Publish แล้ว) ด้วย Drizzle
+    const dbNews = await db
+        .select()
+        .from(news)
+        .where(eq(news.status, 'Published'))
+        .orderBy(desc(news.createdAt)) // เรียงจากใหม่ไปเก่า
+        .limit(4); // ดึงมาแสดงแค่ 4 ข่าวล่าสุด
 
     // 3. แปลงข้อมูลให้เข้ากับ Props ของ NewsCard และรองรับ 2 ภาษา
     const newsItems = dbNews.map((item) => {
-        const title = locale === 'th' ? item.headlineTh : item.headlineEn;
-        const detail = locale === 'th' ? item.bodyTh : item.bodyEn;
+        // 👉 ทำระบบ Fallback ภาษา (ถ้าไม่มีภาษาที่ต้องการ ให้ดึงอีกภาษามาแสดงแทน)
+        const title = locale === 'th' 
+            ? (item.headlineTh || item.headlineEn) 
+            : (item.headlineEn || item.headlineTh);
+            
+        const detail = locale === 'th' 
+            ? (item.bodyTh || item.bodyEn) 
+            : (item.bodyEn || item.bodyTh);
 
         return {
             id: item.id,
@@ -47,8 +56,8 @@ export default async function News() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-4 gap-6 mb-12 max-md:grid-cols-1 max-md:gap-8">
-                        {newsItems.map((news) => (
-                            <NewsCard key={news.id} {...news} />
+                        {newsItems.map((newsItem) => (
+                            <NewsCard key={newsItem.id} {...newsItem} />
                         ))}
                     </div>
                 )}

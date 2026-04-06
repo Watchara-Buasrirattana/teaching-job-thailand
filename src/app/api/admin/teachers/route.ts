@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
+import { teacher } from '@/db/schema';
+import { db } from '@/lib/db';
+import { desc } from 'drizzle-orm';
 
 // ดึงข้อมูลครูทั้งหมด (GET)
 export async function GET() {
     try {
-        const teachers = await prisma.teacher.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
-        return NextResponse.json({ success: true, data: teachers });
+        const teachersList = await db.select().from(teacher).orderBy(desc(teacher.createdAt));
+        return NextResponse.json({ success: true, data: teachersList });
     } catch (error) {
         return NextResponse.json({ success: false, message: "Server Error" }, { status: 500 });
     }
@@ -48,16 +48,25 @@ export async function POST(request: Request) {
             imagePath = `/uploads/teachers/${filename}`;
         }
 
-        const newTeacher = await prisma.teacher.create({
-            data: {
-                title, fName, lName, country, schoolProject, phone, email,
-                passportNumber,
-                visaExpiryDate: visaExpiryDate ? new Date(visaExpiryDate) : null,
-                workPermitNumber,
-                workPermitExpiryDate: workPermitExpiryDate ? new Date(workPermitExpiryDate) : null,
-                status,
-                image: imagePath
-            }
+        // 👈 1. สร้าง ID ด้วยตัวเอง (เพราะ Drizzle/MySQL ไม่คืนค่าแถวที่ Insert ออกมาให้ตรงๆ)
+        const newId = crypto.randomUUID();
+
+        // 👈 2. เปลี่ยนจาก prisma.teacher.create เป็น db.insert()
+        await db.insert(teacher).values({
+            id: newId,
+            title, 
+            fName, 
+            lName, 
+            country, 
+            schoolProject, 
+            phone, 
+            email,
+            passportNumber,
+            visaExpiryDate: visaExpiryDate ? new Date(visaExpiryDate) : null,
+            workPermitNumber,
+            workPermitExpiryDate: workPermitExpiryDate ? new Date(workPermitExpiryDate) : null,
+            status,
+            image: imagePath
         });
 
         // จด Log
@@ -68,12 +77,30 @@ export async function POST(request: Request) {
                 adminId: parseInt(adminToken),
                 action: "CREATE",
                 entity: "Teacher",
-                entityId: newTeacher.id,
+                entityId: newId, // 👈 ใช้ newId
                 details: `เพิ่มครูใหม่: ${fName} ${lName}`
             });
         }
 
-        return NextResponse.json({ success: true, data: newTeacher });
+        // 👈 3. สร้าง Object ข้อมูลครูที่เพิ่งเพิ่ม เพื่อส่งกลับไปให้หน้าบ้านรับรู้
+        const newTeacherData = {
+            id: newId,
+            title, 
+            fName, 
+            lName, 
+            country, 
+            schoolProject, 
+            phone, 
+            email,
+            passportNumber,
+            visaExpiryDate: visaExpiryDate ? new Date(visaExpiryDate) : null,
+            workPermitNumber,
+            workPermitExpiryDate: workPermitExpiryDate ? new Date(workPermitExpiryDate) : null,
+            status,
+            image: imagePath
+        };
+
+        return NextResponse.json({ success: true, data: newTeacherData }, { status: 201 });
     } catch (error) {
         console.error("POST Error:", error);
         return NextResponse.json({ success: false, message: "Create failed" }, { status: 500 });

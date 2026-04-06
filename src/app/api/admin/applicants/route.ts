@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { db } from '@/lib/db';
+import { desc } from 'drizzle-orm';
+import { applicationForm } from '@/db/schema';
 
 export async function GET() {
     try {
         // ดึงข้อมูลผู้สมัครทั้งหมด เรียงจากใหม่ล่าสุดไปเก่า
-        const applicants = await prisma.applicationForm.findMany({
-            orderBy: { createdAt: 'desc' }
-        });
+        const applicants = await db.select().from(applicationForm).orderBy(desc(applicationForm.createdAt));
 
         return NextResponse.json({ success: true, data: applicants });
     } catch (error) {

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
+import { applicationForm } from '@/db/schema';
+import { eq } from 'drizzle-orm/sql/expressions/conditions';
+import { db } from '@/lib/db';
 
 // --- อัปเดตสถานะ (UPDATE STATUS) ---
 export async function PUT(
@@ -14,12 +16,23 @@ export async function PUT(
         const { id } = await params;
         const body = await request.json(); // รับค่า status ที่ส่งมาจากหน้าบ้าน
 
-        const updatedApplicant = await prisma.applicationForm.update({
-            where: { id },
-            data: { status: body.status }
-        });
+        // 👉 1. ดึงข้อมูลเดิมออกมาก่อน เพื่อเอาชื่อมาจด Log
+        const [applicant] = await db
+            .select()
+            .from(applicationForm)
+            .where(eq(applicationForm.id, id))
+            .limit(1);
 
-        // 📝 จด Log การทำงาน
+        if (!applicant) {
+            return NextResponse.json({ success: false, message: "Applicant not found" }, { status: 404 });
+        }
+
+        // 👉 2. สั่งอัปเดตสถานะ
+        await db.update(applicationForm)
+            .set({ status: body.status })
+            .where(eq(applicationForm.id, id));
+
+        // 📝 3. จด Log การทำงานโดยใช้ชื่อจากตัวแปร applicant ที่ดึงมา
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
         if (adminToken) {
@@ -28,11 +41,13 @@ export async function PUT(
                 action: "UPDATE",
                 entity: "Applicant",
                 entityId: id,
-                details: `เปลี่ยนสถานะเป็น '${body.status}': ${updatedApplicant.firstName} ${updatedApplicant.lastName}`
+                details: `เปลี่ยนสถานะเป็น '${body.status}': ${applicant.firstName} ${applicant.lastName}` // 👈 ใช้ applicant.firstName
             });
         }
 
-        return NextResponse.json({ success: true, data: updatedApplicant });
+        // ส่งข้อมูลที่อัปเดตแล้วกลับไปให้หน้าบ้าน
+        return NextResponse.json({ success: true, data: { ...applicant, status: body.status } });
+
     } catch (error) {
         console.error("Update Status Error:", error);
         return NextResponse.json({ success: false, message: "Update failed" }, { status: 500 });
@@ -46,12 +61,12 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        const applicant = await prisma.applicationForm.findUnique({ where: { id } });
+        const [applicant] = await db.select().from(applicationForm).where(eq(applicationForm.id, id)).limit(1);
 
         if (!applicant) return NextResponse.json({ success: false, message: "Not found" });
 
         // ลบข้อมูลออกจากฐานข้อมูล
-        await prisma.applicationForm.delete({ where: { id } });
+        await db.delete(applicationForm).where(eq(applicationForm.id, id));
 
         // ลบไฟล์ PDF ออกจากโฟลเดอร์ uploads (เพื่อประหยัดพื้นที่เซิร์ฟเวอร์)
         const deleteFile = async (p: string) => {

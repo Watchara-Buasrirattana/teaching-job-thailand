@@ -1,4 +1,6 @@
-import prisma from '@/lib/prisma';
+// src/lib/logger.ts
+import { db } from '@/lib/db';
+import { activityLog } from '@/db/schema';
 
 export async function logAdminAction({
     adminId,
@@ -14,14 +16,13 @@ export async function logAdminAction({
     details?: string;
 }) {
     try {
-        await prisma.activityLog.create({
-            data: {
-                adminId,
-                action,
-                entity,
-                entityId,
-                details
-            }
+        // บันทึก Log ลงในฐานข้อมูล
+        await db.insert(activityLog).values({
+            adminId,
+            action,
+            entity,
+            entityId,
+            details
         });
     } catch (error) {
         console.error("🔥 บันทึก Log ไม่สำเร็จ:", error);
