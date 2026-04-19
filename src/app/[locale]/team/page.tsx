@@ -3,18 +3,15 @@ import Breadcrumb from "@/components/Breadcrumb";
 import TeacherCard from "@/components/TeacherCard";
 import Pagination from "@/components/Pagination";
 import ReviewCard from "@/components/ReviewCard";
-import { getTranslations } from "next-intl/server"; // ✅ เปลี่ยนมาใช้ตัวนี้สำหรับ Server Component
-import prisma from "@/lib/prisma"; // ✅ Import Prisma
+import { getTranslations } from "next-intl/server"; 
+import prisma from "@/lib/prisma"; 
 
-// ✅ เปลี่ยนเป็น async function
 export default async function TeamPage({
     searchParams
 }: {
     searchParams: Promise<{ page?: string }>
 }) {
-    const t = await getTranslations("Team"); // ✅ ใช้ await
-
-    // ✅ ใช้ await แกะค่าแทน use()
+    const t = await getTranslations("Team"); 
     const resolvedSearchParams = await searchParams;
 
     const executivesList = t.raw("executivesList");
@@ -22,13 +19,13 @@ export default async function TeamPage({
     const schoolsList = t.raw("schoolsList");
     const honoredList = t.raw("honoredList");
 
-    // --- ส่วนของระบบ Pagination และดึงข้อมูลจริง ---
+    // --- ส่วนของระบบ Pagination และดึงข้อมูลครู ---
     const itemsPerPage = 5; 
     const currentPage = Number(resolvedSearchParams.page) || 1;
 
     // 1. นับจำนวนครูทั้งหมดที่มีสถานะ Active
     const totalTeachers = await prisma.teacher.count({
-        where: { status: 'Active' } // ดึงเฉพาะคนที่ Active
+        where: { status: 'Active' } 
     });
     
     const totalPages = Math.ceil(totalTeachers / itemsPerPage);
@@ -36,22 +33,38 @@ export default async function TeamPage({
     // 2. ดึงข้อมูลครูจาก Database
     const displayedTeachers = await prisma.teacher.findMany({
         where: { status: 'Active' },
-        orderBy: { createdAt: 'desc' }, // เอาคนล่าสุดขึ้นก่อน
+        orderBy: { createdAt: 'desc' }, 
         skip: (currentPage - 1) * itemsPerPage,
         take: itemsPerPage,
     });
 
-    // ข้อมูลจำลองสำหรับรีวิว (คงไว้ตามที่คุณแจ้ง)
-    const reviews = [
-        {
-            title: "มีความเป็นมืออาชีพและไม่ต้องกังวลเรื่องเอกสาร!",
-            text: "การย้ายมาสอนที่ไทยดูเป็นเรื่องใหญ่ แต่ PKP ช่วยให้ขั้นตอนวีซ่าและใบอนุญาตทำงานราบรื่นอย่างไม่น่าเชื่อ...",
-            name: "Jonathan Davies",
-            country: "สหรัฐอเมริกา",
-            image: "/teacher.png"
+    // --- ส่วนดึงข้อมูลรีวิวจริงจาก Database ---
+    const dbReviews = await prisma.review.findMany({
+        where: { status: true }, // ดึงเฉพาะรีวิวที่ตั้งให้โชว์หน้าเว็บ (Active)
+        include: {
+            teacher: {
+                select: {
+                    title: true,
+                    fName: true,
+                    lName: true,
+                    country: true,
+                    image: true,
+                }
+            }
         },
-        // (สามารถเพิ่ม ReviewCard เพิ่มเติมตรงนี้ได้)
-    ];
+        orderBy: { createdAt: 'desc' }, // ดึงรีวิวใหม่ล่าสุดขึ้นก่อน
+        take: 3 // กำหนดจำนวนรีวิวที่จะแสดง เช่น 3 หรือ 6 อันล่าสุด (ปรับเปลี่ยนได้)
+    });
+
+    // แมพข้อมูลจาก DB ให้เข้ากับ Props ที่ ReviewCard ต้องการ
+    const reviews = dbReviews.map((r) => ({
+        title: r.title,
+        text: r.content,
+        name: `${r.teacher.title || ''} ${r.teacher.fName} ${r.teacher.lName}`.trim(),
+        country: r.teacher.country || 'ไม่ระบุประเทศ',
+        image: r.teacher.image || '/teacher.png',
+        rating: r.rating // เผื่อ ReviewCard ของคุณมีการรองรับดาว (1-5)
+    }));
     // ----------------------------
 
     return (
@@ -82,7 +95,7 @@ export default async function TeamPage({
                         {displayedTeachers.map((teacher) => (
                             <TeacherCard
                                 key={teacher.id}
-                                img={teacher.image || '/placeholder-avatar.jpg'} // 👉 ส่งรูปภาพถ้ามี ถ้าไม่มีใช้ placeholder
+                                img={teacher.image || '/placeholder-avatar.jpg'} 
                                 name={`${teacher.title || ''} ${teacher.fName} ${teacher.lName}`.trim()}
                                 country={teacher.country || ''}
                             />
@@ -97,6 +110,7 @@ export default async function TeamPage({
                     </div>
                 )}
 
+                {/* ---------------- รีวิว ---------------- */}
                 <section className="py-12 max-md:py-6">
                     <div className="container mx-auto max-w-7xl px-4">
                         {/* Header */}
@@ -109,12 +123,18 @@ export default async function TeamPage({
                             </p>
                         </div>
 
-                        {/* Grid: Desktop 3 columns / Mobile 1 column */}
-                        <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
-                            {reviews.map((item, index) => (
-                                <ReviewCard key={index} {...item} />
-                            ))}
-                        </div>
+                        {/* ตรวจสอบว่ามีรีวิวหรือไม่ */}
+                        {reviews.length === 0 ? (
+                            <div className="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-xl">
+                                ยังไม่มีรีวิวในขณะนี้
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
+                                {reviews.map((item, index) => (
+                                    <ReviewCard key={index} {...item} />
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </section>
 

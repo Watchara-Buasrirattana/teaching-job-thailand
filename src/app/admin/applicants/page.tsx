@@ -1,7 +1,7 @@
+// src/app/admin/applicants/page.tsx
 'use client';
 import { useState, useEffect } from 'react';
 import { FiSearch, FiTrash2, FiEdit, FiEye } from 'react-icons/fi';
-import { BiSortAlt2 } from 'react-icons/bi';
 
 export default function ApplicantsPage() {
     const [applicants, setApplicants] = useState<any[]>([]);
@@ -142,7 +142,7 @@ export default function ApplicantsPage() {
                 {/* แถว 1: Title & Search */}
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-baseline gap-4">
-                        <h1 className="text-2xl font-bold text-[#0A0A8B]">Applicants</h1>
+                        <h1 className="text-2xl font-bold text-primary">Applicants</h1>
                         <span className="text-gray-400 text-sm">Manage your applicants.</span>
                     </div>
                 </div>
@@ -157,7 +157,7 @@ export default function ApplicantsPage() {
                             placeholder="Name search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full outline-none focus:ring-2 focus:ring-[#0A0A8B]/20 transition"
+                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full outline-none focus:ring-2 focus:ring-primary/20 transition"
                         />
                     </div>
 
@@ -168,7 +168,7 @@ export default function ApplicantsPage() {
                                 type="checkbox" 
                                 checked={filteredApplicants.length > 0 && selectedIds.length === filteredApplicants.length}
                                 onChange={handleSelectAll}
-                                className="rounded border-gray-300 w-4 h-4 accent-[#0A0A8B]"
+                                className="rounded border-gray-300 w-4 h-4 accent-primary"
                             />
                             <span>Select all</span>
                         </label>
@@ -231,7 +231,7 @@ export default function ApplicantsPage() {
                                                 type="checkbox"
                                                 checked={selectedIds.includes(app.id)}
                                                 onChange={() => handleSelectOne(app.id)}
-                                                className="rounded border-gray-300 w-4 h-4 accent-[#0A0A8B] cursor-pointer"
+                                                className="rounded border-gray-300 w-4 h-4 accent-primary cursor-pointer"
                                             />
                                         </td>
                                         <td className="py-4 px-4 text-gray-600">{app.title} {app.firstName} {app.lastName}</td>
@@ -241,9 +241,9 @@ export default function ApplicantsPage() {
                                         <td className="py-4 px-4">
                                             <div className="flex gap-1.5">
                                                 {/* CV Badge */}
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.resume ? 'bg-[#0A0A8B] text-white border-[#0A0A8B]' : 'bg-transparent text-gray-300 border-gray-200'}`}>CV</span>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.resume ? 'bg-primary text-white border-primary' : 'bg-transparent text-gray-300 border-gray-200'}`}>CV</span>
                                                 {/* CL Badge */}
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.coverLetter ? 'bg-[#0A0A8B] text-white border-[#0A0A8B]' : 'bg-transparent text-gray-300 border-gray-200'}`}>CL</span>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.coverLetter ? 'bg-primary text-white border-primary' : 'bg-transparent text-gray-300 border-gray-200'}`}>CL</span>
                                             </div>
                                         </td>
                                         <td className="py-4 px-4">
@@ -251,13 +251,13 @@ export default function ApplicantsPage() {
                                         </td>
                                         <td className="py-4 px-4 text-center">
                                             <div className="flex items-center justify-center gap-3">
-                                                <button onClick={() => setViewData(app)} className="text-[#0A0A8B] hover:scale-110 transition-transform" title="View Details">
+                                                <button onClick={() => setViewData(app)} className="text-primary hover:scale-110 transition-transform" title="View Details">
                                                     <FiEye size={16} />
                                                 </button>
-                                                <button onClick={() => setEditData(app)} className="text-[#0A0A8B] hover:scale-110 transition-transform" title="Update Status">
+                                                <button onClick={() => setEditData(app)} className="text-primary hover:scale-110 transition-transform" title="Update Status">
                                                     <FiEdit size={16} />
                                                 </button>
-                                                <button onClick={() => handleDelete(app.id)} className="text-[#0A0A8B] hover:text-red-500 hover:scale-110 transition-transform" title="Delete">
+                                                <button onClick={() => handleDelete(app.id)} className="text-primary hover:text-red-500 hover:scale-110 transition-transform" title="Delete">
                                                     <FiTrash2 size={16} />
                                                 </button>
                                             </div>
@@ -279,7 +279,7 @@ export default function ApplicantsPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in">
                     <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden">
                         <div className="p-6 border-b flex justify-between items-center bg-gray-50">
-                            <h2 className="text-2xl font-bold text-[#0A0A8B]">Applicant Details</h2>
+                            <h2 className="text-2xl font-bold text-primary">Applicant Details</h2>
                             <button onClick={() => setViewData(null)} className="text-gray-400 hover:text-gray-600">✕</button>
                         </div>
                         <div className="p-6 space-y-4">
@@ -295,10 +295,10 @@ export default function ApplicantsPage() {
                             </div>
                             <div className="pt-4 flex gap-4">
                                 {viewData.resume && (
-                                    <a href={viewData.resume} target="_blank" className="bg-[#0A0A8B] text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:bg-blue-900">View Resume (CV)</a>
+                                    <a href={viewData.resume} target="_blank" className="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:bg-blue-900">View Resume (CV)</a>
                                 )}
                                 {viewData.coverLetter && (
-                                    <a href={viewData.coverLetter} target="_blank" className="border-2 border-[#0A0A8B] text-[#0A0A8B] px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-50">View Cover Letter</a>
+                                    <a href={viewData.coverLetter} target="_blank" className="border-2 border-primary text-primary px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-50">View Cover Letter</a>
                                 )}
                             </div>
                         </div>
@@ -311,7 +311,7 @@ export default function ApplicantsPage() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in">
                     <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
                         <div className="p-6 border-b flex justify-between items-center bg-gray-50">
-                            <h2 className="text-xl font-bold text-[#0A0A8B]">Update Status</h2>
+                            <h2 className="text-xl font-bold text-primary">Update Status</h2>
                             <button onClick={() => setEditData(null)} className="text-gray-400 hover:text-gray-600">✕</button>
                         </div>
                         <form onSubmit={handleUpdateStatus} className="p-6">
@@ -320,7 +320,7 @@ export default function ApplicantsPage() {
                             <select
                                 value={editData.status}
                                 onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-                                className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-[#0A0A8B]/20 mb-6"
+                                className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20 mb-6"
                             >
                                 <option value="New">New</option>
                                 <option value="Under Review">Under Review</option>
@@ -330,7 +330,7 @@ export default function ApplicantsPage() {
                             </select>
                             <div className="flex justify-end gap-3">
                                 <button type="button" onClick={() => setEditData(null)} className="px-6 py-2 rounded-full text-gray-600 hover:bg-gray-100 font-bold">Cancel</button>
-                                <button type="submit" disabled={isSubmitting} className="bg-[#0A0A8B] text-white px-6 py-2 rounded-full font-bold hover:bg-blue-900 disabled:opacity-50">
+                                <button type="submit" disabled={isSubmitting} className="bg-primary text-white px-6 py-2 rounded-full font-bold hover:bg-blue-900 disabled:opacity-50">
                                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>

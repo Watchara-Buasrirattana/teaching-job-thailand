@@ -52,7 +52,7 @@ export default async function NewsPage({
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             }),
-            img: item.featuredImage || "/placeholder.jpg" // ถ้ารูปไม่มีให้ใส่รูปสำรอง
+            img: item.featuredImage || "/defaultImageContent.png" // ถ้ารูปไม่มีให้ใส่รูปสำรอง
         };
     });
 

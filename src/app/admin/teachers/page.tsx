@@ -114,7 +114,7 @@ export default function TeachersPage() {
         switch (status) {
             case 'Urgent': return 'text-red-500';
             case 'Warning': return 'text-yellow-500';
-            case 'Processing': return 'text-blue-500';
+            case 'Processing': return 'text-primary';
             case 'Active': return 'text-green-500';
             default: return 'text-gray-500';
         }
@@ -408,7 +408,7 @@ export default function TeachersPage() {
                     <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden">
                         <div className="p-6 border-b flex justify-between items-center bg-white">
                             <h2 className="text-xl font-bold text-primary">Teacher Details</h2>
-                            <button onClick={() => setViewData(null)} className="text-blue-500 hover:bg-blue-50 p-2 rounded-full"><FiX size={18} /></button>
+                            <button onClick={() => setViewData(null)} className="text-primary hover:bg-blue-50 p-2 rounded-full"><FiX size={18} /></button>
                         </div>
                         <div className="p-8 space-y-6">
                             <div className="flex gap-6 items-start">
@@ -459,7 +459,7 @@ export default function TeachersPage() {
 
                         <div className="p-6 border-b flex justify-between items-center bg-white shrink-0">
                             <h2 className="text-xl font-bold text-primary">{editData ? 'Edit Teacher' : 'Add New Teacher'}</h2>
-                            <button onClick={() => { setIsAddModalOpen(false); setEditData(null); }} className="text-blue-500 hover:bg-blue-50 p-2 rounded-full"><FiX size={18} /></button>
+                            <button onClick={() => { setIsAddModalOpen(false); setEditData(null); }} className="text-primary hover:bg-blue-50 p-2 rounded-full"><FiX size={18} /></button>
                         </div>
 
                         <form onSubmit={handleFormSubmit} className="overflow-y-auto p-8 space-y-8 text-sm text-gray-700">
@@ -577,7 +577,7 @@ export default function TeachersPage() {
                             </div>
 
                             <div className="flex justify-end gap-4 pt-4 border-t mt-4">
-                                <button type="button" onClick={() => { setIsAddModalOpen(false); setEditData(null); }} className="px-6 py-2.5 rounded-full text-blue-500 font-bold hover:bg-gray-50">Cancel</button>
+                                <button type="button" onClick={() => { setIsAddModalOpen(false); setEditData(null); }} className="px-6 py-2.5 rounded-full text-primary font-bold hover:bg-gray-50">Cancel</button>
                                 <button type="submit" disabled={isSubmitting} className="bg-primary text-white px-8 py-2.5 rounded-full font-bold hover:bg-blue-900 shadow-md disabled:opacity-50">
                                     {isSubmitting ? 'Saving...' : editData ? 'Edit Teacher' : 'Add Teacher'}
                                 </button>

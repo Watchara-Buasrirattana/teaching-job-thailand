@@ -303,7 +303,7 @@ export default function NewsPage() {
                                             <span className={`italic ${news.status === 'Published' ? 'text-primary' : 'text-accent'}`}>{news.status}</span>
                                         </td>
                                         <td className="py-3 px-4 text-center">
-                                            <button onClick={() => handleEdit(news.id)} className="text-blue-500 hover:scale-110 transition-transform mr-3">
+                                            <button onClick={() => handleEdit(news.id)} className="text-primary hover:scale-110 transition-transform mr-3">
                                                 <FiEdit size={16} />
                                             </button>
                                             <button onClick={() => handleDeleteClick(news)} className="text-red-500 hover:scale-110 transition-transform">
@@ -402,7 +402,7 @@ export default function NewsPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <p className="text-[10px] text-blue-500 mb-2 font-medium">Selected: {existingGallery.length + galleryImages.length}/4</p>
+                                        <p className="text-[10px] text-primary mb-2 font-medium">Selected: {existingGallery.length + galleryImages.length}/4</p>
                                     </div>
 
                                     {/* Actions */}
