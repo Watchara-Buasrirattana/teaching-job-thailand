@@ -7,7 +7,7 @@ import prisma from "@/lib/prisma";
 export default async function NewsPage({
     searchParams
 }: {
-    searchParams: { page?: string }
+    searchParams: Promise<{ page?: string }>
 }) {
     // ใช้ next-intl/server เพื่อดึงภาษาปัจจุบัน (th หรือ en)
     const locale = await getLocale();
@@ -16,7 +16,8 @@ export default async function NewsPage({
 
     // 1. ตั้งค่าการแบ่งหน้า
     const itemsPerPage = 8;
-    const currentPage = Number(searchParams.page) || 1;
+    const { page } = await searchParams;
+    const currentPage = Number(page) || 1;
 
     // 2. นับจำนวนข่าวทั้งหมดที่เป็น "Published" เพื่อทำ Pagination
     const totalNews = await prisma.news.count({
@@ -34,7 +35,7 @@ export default async function NewsPage({
 
     // 4. แปลงข้อมูลจาก DB ให้เข้ากับรูปแบบของ NewsCard และกรองตามภาษา
     const displayedNews = dbNews.map((item) => {
-        
+
         const title = locale === 'th'
             ? (item.headlineTh || item.headlineEn)
             : (item.headlineEn || item.headlineTh);

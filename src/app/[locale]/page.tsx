@@ -6,7 +6,7 @@ import AboutUs from '@/components/AboutUs';
 import News from '@/components/News';
 
 export default function HomePage() {
-  const t = useTranslations('HomePage');
+  const t = useTranslations("Home");
 
   return (
     <div className="flex flex-col gap-0 font-prompt">
