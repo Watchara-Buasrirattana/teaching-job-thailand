@@ -1,3 +1,4 @@
+// src/app/api/admin/teachers/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { writeFile, mkdir } from 'fs/promises';
