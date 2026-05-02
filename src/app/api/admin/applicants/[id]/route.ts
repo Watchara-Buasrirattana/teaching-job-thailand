@@ -1,8 +1,7 @@
 // src/app/api/admin/applicants/[id]/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { unlink } from 'fs/promises';
-import path from 'path';
+import { deleteFile } from '@/lib/upload'
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
 
@@ -55,9 +54,6 @@ export async function DELETE(
         await prisma.applicationForm.delete({ where: { id } });
 
         // ลบไฟล์ PDF ออกจากโฟลเดอร์ uploads (เพื่อประหยัดพื้นที่เซิร์ฟเวอร์)
-        const deleteFile = async (p: string) => {
-            try { await unlink(path.join(process.cwd(), "public", p)); } catch (e) { }
-        };
         if (applicant.resumeUrl) await deleteFile(applicant.resumeUrl);
         if (applicant.coverLetter) await deleteFile(applicant.coverLetter);
 

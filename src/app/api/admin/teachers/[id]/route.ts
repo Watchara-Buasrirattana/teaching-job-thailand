@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import path from 'path';
+import { uploadFile, deleteFile } from '@/lib/upload'
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
 
@@ -52,18 +51,10 @@ export async function PUT(
             // จัดการรูปภาพใหม่ (ถ้ามี)
             const imageFile = formData.get('image') as File;
             if (imageFile && imageFile.size > 0) {
-                const uploadDir = path.join(process.cwd(), "public/uploads/teachers");
-                await mkdir(uploadDir, { recursive: true });
-
-                // ลบรูปเก่า
                 if (oldTeacher?.image) {
-                    try { await unlink(path.join(process.cwd(), "public", oldTeacher.image)); } catch (e) { }
+                    await deleteFile(oldTeacher.image);
                 }
-
-                const buffer = Buffer.from(await imageFile.arrayBuffer());
-                const filename = `teacher_${Date.now()}_${imageFile.name.replaceAll(" ", "_")}`;
-                await writeFile(path.join(uploadDir, filename), buffer);
-                updatedData.image = `/uploads/teachers/${filename}`;
+                updatedData.image = await uploadFile(imageFile, 'image', 'teachers');
             }
         }
 
@@ -105,7 +96,7 @@ export async function DELETE(
         await prisma.teacher.delete({ where: { id } });
 
         if (teacher.image) {
-            try { await unlink(path.join(process.cwd(), "public", teacher.image)); } catch (e) { }
+            await deleteFile(teacher.image);
         }
 
         const cookieStore = await cookies();

@@ -1,8 +1,7 @@
 // src/app/api/admin/teachers/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadFile } from '@/lib/upload'
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
 
@@ -41,12 +40,7 @@ export async function POST(request: Request) {
         let imagePath = null;
 
         if (imageFile && imageFile.size > 0) {
-            const uploadDir = path.join(process.cwd(), "public/uploads/teachers");
-            await mkdir(uploadDir, { recursive: true });
-            const buffer = Buffer.from(await imageFile.arrayBuffer());
-            const filename = `teacher_${Date.now()}_${imageFile.name.replaceAll(" ", "_")}`;
-            await writeFile(path.join(uploadDir, filename), buffer);
-            imagePath = `/uploads/teachers/${filename}`;
+            imagePath = await uploadFile(imageFile, 'image', 'teachers');
         }
 
         const newTeacher = await prisma.teacher.create({

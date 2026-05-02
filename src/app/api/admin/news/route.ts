@@ -1,8 +1,7 @@
 import { logAdminAction } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadFile } from '@/lib/upload'
 import { cookies } from 'next/headers';
 
 // ดึงข้อมูลข่าวทั้งหมด
@@ -29,18 +28,11 @@ export async function POST(request: Request) {
         const bodyEn = formData.get('bodyEn') as string;
         const status = formData.get('status') as string;
 
-        // เตรียมโฟลเดอร์สำหรับเก็บรูปข่าว
-        const uploadDir = path.join(process.cwd(), "public/uploads/news");
-        await mkdir(uploadDir, { recursive: true });
-
         // 2. จัดการรูปปก (Featured Image)
         let featuredImagePath = "";
         const featuredFile = formData.get('featuredImage') as File;
         if (featuredFile && featuredFile.size > 0) {
-            const buffer = Buffer.from(await featuredFile.arrayBuffer());
-            const filename = `featured_${Date.now()}_${featuredFile.name.replaceAll(" ", "_")}`;
-            await writeFile(path.join(uploadDir, filename), buffer);
-            featuredImagePath = `/uploads/news/${filename}`;
+            featuredImagePath = await uploadFile(featuredFile, 'featuredImage', 'news');
         }
 
         // 3. จัดการรูปแกลลอรี่ (ดึงไฟล์ทั้งหมดที่ส่งมาด้วยชื่อ 'galleryImages')
@@ -49,10 +41,8 @@ export async function POST(request: Request) {
         for (let i = 0; i < galleryFiles.length; i++) {
             const file = galleryFiles[i];
             if (file && file.size > 0) {
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const filename = `gallery_${Date.now()}_${i}_${file.name.replaceAll(" ", "_")}`;
-                await writeFile(path.join(uploadDir, filename), buffer);
-                galleryPaths.push(`/uploads/news/${filename}`);
+                const url = await uploadFile(file, `gallery_${i}`, 'news');
+                galleryPaths.push(url);
             }
         }
 

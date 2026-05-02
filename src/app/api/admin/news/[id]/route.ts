@@ -1,28 +1,27 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir, unlink } from 'fs/promises';
-import path from 'path';
+import { uploadFile, deleteFile } from '@/lib/upload'
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
 
 // --- UPDATE NEWS ---
 export async function PUT(
-    request: Request, 
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
-        
+
         // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
         if (!adminToken) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
-        
+
         const { id } = await params;
-        
+
         const formData = await request.formData();
-        
+
         // ใช้ id ที่เป็น String ค้นหา
         const oldNews = await prisma.news.findUnique({ where: { id } });
         if (!oldNews) return NextResponse.json({ success: false, message: "News not found" }, { status: 404 });
@@ -34,21 +33,14 @@ export async function PUT(
         const bodyEn = formData.get('bodyEn') as string;
         const status = formData.get('status') as string;
 
-        // ... โค้ดจัดการรูปปก (Featured Image) เหมือนเดิม ...
-        const uploadDir = path.join(process.cwd(), "public/uploads/news");
-        await mkdir(uploadDir, { recursive: true });
-
         let featuredImagePath = oldNews.featuredImage;
         const featuredFile = formData.get('featuredImage') as File;
 
         if (featuredFile && featuredFile.size > 0) {
             if (oldNews.featuredImage) {
-                try { await unlink(path.join(process.cwd(), "public", oldNews.featuredImage)); } catch (e) {}
+                await deleteFile(oldNews.featuredImage);
             }
-            const buffer = Buffer.from(await featuredFile.arrayBuffer());
-            const filename = `featured_${Date.now()}_${featuredFile.name.replaceAll(" ", "_")}`;
-            await writeFile(path.join(uploadDir, filename), buffer);
-            featuredImagePath = `/uploads/news/${filename}`;
+            featuredImagePath = await uploadFile(featuredFile, 'featuredImage', 'news');
         }
 
         // ... โค้ดจัดการแกลลอรี่ (Gallery) เหมือนเดิม ...
@@ -59,19 +51,17 @@ export async function PUT(
         const oldGallery = (oldNews.galleryImages as string[]) || [];
         const imagesToDelete = oldGallery.filter(img => !keptGallery.includes(img));
         for (const img of imagesToDelete) {
-            try { await unlink(path.join(process.cwd(), "public", img)); } catch (e) {}
+            await deleteFile(img);
         }
 
         const newGalleryPaths: string[] = [];
         const galleryFiles = formData.getAll('galleryImages') as File[];
-        
+
         for (let i = 0; i < galleryFiles.length; i++) {
             const file = galleryFiles[i];
             if (file && file.size > 0) {
-                const buffer = Buffer.from(await file.arrayBuffer());
-                const filename = `gallery_${Date.now()}_${i}_${file.name.replaceAll(" ", "_")}`;
-                await writeFile(path.join(uploadDir, filename), buffer);
-                newGalleryPaths.push(`/uploads/news/${filename}`);
+                const url = await uploadFile(file, `gallery_${i}`, 'news');
+                newGalleryPaths.push(url);
             }
         }
 
@@ -80,10 +70,10 @@ export async function PUT(
         // --- 3. บันทึกลง Database ---
         const updatedNews = await prisma.news.update({
             where: { id },
-            data: { 
-                headlineTh, headlineEn, bodyTh, bodyEn, status, 
+            data: {
+                headlineTh, headlineEn, bodyTh, bodyEn, status,
                 featuredImage: featuredImagePath,
-                galleryImages: finalGallery 
+                galleryImages: finalGallery
             }
         });
 
@@ -104,13 +94,13 @@ export async function PUT(
 
 // --- DELETE NEWS ---
 export async function DELETE(
-    request: Request, 
+    request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
-        
+
         // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
         if (!adminToken) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
@@ -121,10 +111,6 @@ export async function DELETE(
         if (!news) return NextResponse.json({ success: false, message: "Not found" });
 
         await prisma.news.delete({ where: { id } }); // ลบด้วย id (String)
-
-        const deleteFile = async (p: string) => {
-            try { await unlink(path.join(process.cwd(), "public", p)); } catch (e) {}
-        };
 
         if (news.featuredImage) await deleteFile(news.featuredImage);
         const gallery = (news.galleryImages as string[]) || [];

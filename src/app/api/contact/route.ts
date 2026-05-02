@@ -1,8 +1,7 @@
 // app/api/contact/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { uploadFile } from '@/lib/upload'
 
 export async function POST(request: Request) {
     try {
@@ -24,25 +23,11 @@ export async function POST(request: Request) {
 
 
         if (resumeFile) {
-            // 👇 โค้ดส่วนที่เพิ่มมาใหม่: เช็คและสร้างโฟลเดอร์ uploads ถ้ายังไม่มี
-            const uploadDir = path.join(process.cwd(), "public/uploads");
-            await mkdir(uploadDir, { recursive: true });
-
-            const buffer = Buffer.from(await resumeFile.arrayBuffer());
-            const filename = Date.now() + "_" + resumeFile.name.replaceAll(" ", "_");
-            await writeFile(path.join(uploadDir, filename), buffer);
-            resumePath = "/uploads/" + filename;
+            resumePath = await uploadFile(resumeFile, 'resume', 'applicants');
         }
 
         if (coverLetterFile) {
-            // 👇 โค้ดส่วนที่เพิ่มมาใหม่: เช็คและสร้างโฟลเดอร์ uploads ถ้ายังไม่มี
-            const uploadDir = path.join(process.cwd(), "public/uploads");
-            await mkdir(uploadDir, { recursive: true });
-
-            const buffer = Buffer.from(await coverLetterFile.arrayBuffer());
-            const filename = Date.now() + "_" + coverLetterFile.name.replaceAll(" ", "_");
-            await writeFile(path.join(uploadDir, filename), buffer);
-            coverLetterPath = "/uploads/" + filename;
+            coverLetterPath = await uploadFile(coverLetterFile, 'coverLetter', 'applicants');
         }
 
         // (ถ้ามี Cover Letter ด้วย ก็ใช้วิธีเดียวกันนี้ได้เลยครับ)
