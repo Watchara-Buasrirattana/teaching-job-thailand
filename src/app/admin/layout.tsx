@@ -7,12 +7,8 @@ export const metadata = {
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en">
-            <body>
-                <AdminLayoutWrapper>
-                    {children}
-                </AdminLayoutWrapper>
-            </body>
-        </html>
+        <AdminLayoutWrapper>
+            {children}
+        </AdminLayoutWrapper>
     );
 }
