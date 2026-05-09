@@ -1,3 +1,4 @@
+// Middleware สำหรับจัดการการตรวจสอบสิทธิ์ของ admin และการตั้งค่าภาษา
 import createMiddleware from 'next-intl/middleware';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
