@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# ห้าม crawl หน้า admin และ API
+Disallow: /admin/
+Disallow: /api/
+
+# บอก Google ตำแหน่ง sitemap
+Sitemap: https://teachingjobthailand.com/sitemap.xml
