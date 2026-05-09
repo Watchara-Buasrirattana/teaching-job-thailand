@@ -241,7 +241,7 @@ export default function ApplicantsPage() {
                                         <td className="py-4 px-4">
                                             <div className="flex gap-1.5">
                                                 {/* CV Badge */}
-                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.resume ? 'bg-primary text-white border-primary' : 'bg-transparent text-gray-300 border-gray-200'}`}>CV</span>
+                                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.resumeUrl ? 'bg-primary text-white border-primary' : 'bg-transparent text-gray-300 border-gray-200'}`}>CV</span>
                                                 {/* CL Badge */}
                                                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${app.coverLetter ? 'bg-primary text-white border-primary' : 'bg-transparent text-gray-300 border-gray-200'}`}>CL</span>
                                             </div>
@@ -294,8 +294,8 @@ export default function ApplicantsPage() {
                                 <div className="p-4 bg-gray-50 rounded-lg text-sm whitespace-pre-line">{viewData.message || 'No message provided.'}</div>
                             </div>
                             <div className="pt-4 flex gap-4">
-                                {viewData.resume && (
-                                    <a href={viewData.resume} target="_blank" className="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:bg-blue-900">View Resume (CV)</a>
+                                {viewData.resumeUrl && (
+                                    <a href={viewData.resumeUrl} target="_blank" className="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-md hover:bg-blue-900">View Resume (CV)</a>
                                 )}
                                 {viewData.coverLetter && (
                                     <a href={viewData.coverLetter} target="_blank" className="border-2 border-primary text-primary px-6 py-2 rounded-full text-sm font-bold hover:bg-blue-50">View Cover Letter</a>
