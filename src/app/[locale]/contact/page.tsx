@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 import Breadcrumb from '@/components/Breadcrumb';
 import SuccessModal from '@/components/SuccessModal';
 import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
 
 export default function ContactPage() {
     const t = useTranslations("Navbar");
@@ -83,13 +84,31 @@ export default function ContactPage() {
                 />
 
                 <section className="text-center mt-10 mb-16">
-                    <h1 className="text-5xl font-bold text-primary mb-6">{t2('title')}</h1>
-                    <p className="max-w-5xl mx-auto text-sm md:text-base leading-relaxed whitespace-pre-line">
+                    <motion.h1
+                        className="text-5xl font-bold text-primary mb-6"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        {t2('title')}
+                    </motion.h1>
+                    <motion.p
+                        className="max-w-5xl mx-auto text-sm md:text-base leading-relaxed whitespace-pre-line"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                    >
                         {t2('detail')}
-                    </p>
+                    </motion.p>
                 </section>
 
-                <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto">
+                <motion.form
+                    onSubmit={handleSubmit}
+                    className="space-y-6 max-w-4xl mx-auto"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                >
                     {/* แถวที่ 1: คำนำหน้า, ชื่อ, นามสกุล */}
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12 md:col-span-2">
@@ -147,10 +166,10 @@ export default function ContactPage() {
                                     <button
                                         type="button"
                                         onClick={handleRemoveResume}
-                                        className="text-gray-400 hover:text-red-500 transition-colors text-3xl leading-none"
+                                        className="ml-2 flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-500 text-gray-500 transition-colors font-bold text-sm"
                                         aria-label="Remove file"
                                     >
-                                        ×
+                                        ✕
                                     </button>
                                 )}
                             </div>
@@ -186,10 +205,10 @@ export default function ContactPage() {
                                     <button
                                         type="button"
                                         onClick={handleRemoveCoverLetter}
-                                        className="text-gray-400 hover:text-red-500 transition-colors text-3xl leading-none"
+                                        className="ml-2 flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-500 text-gray-500 transition-colors font-bold text-sm"
                                         aria-label="Remove file"
                                     >
-                                        ×
+                                        ✕
                                     </button>
                                 )}
                             </div>
@@ -240,7 +259,7 @@ export default function ContactPage() {
                             )}
                         </div>
                     </div>
-                </form>
+                </motion.form>
             </div>
 
             <SuccessModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />

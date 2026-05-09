@@ -1,21 +1,18 @@
 import { getTranslations, getLocale } from "next-intl/server";
 import { Link } from "@/i18n/routing";
 import NewsCard from "@/components/NewsCard";
-import prisma from "@/lib/prisma"; // 👉 Import Prisma เข้ามา
+import prisma from "@/lib/prisma";
 
 export default async function News() {
-    // 1. ดึงฟังก์ชันแปลภาษาและภาษาปัจจุบันของหน้าเว็บ
     const t = await getTranslations("News");
     const locale = await getLocale();
 
-    // 2. ดึงข่าวล่าสุดจาก Database 4 ข่าว (เฉพาะที่ Publish แล้ว)
     const dbNews = await prisma.news.findMany({
         where: { status: 'Published' },
-        orderBy: { createdAt: 'desc' }, // เรียงจากใหม่ไปเก่า
-        take: 4, // ดึงมาแสดงแค่ 4 ข่าวล่าสุด
+        orderBy: { createdAt: 'desc' },
+        take: 4,
     });
 
-    // 3. แปลงข้อมูลให้เข้ากับ Props ของ NewsCard และรองรับ 2 ภาษา
     const newsItems = dbNews.map((item) => {
         const title = locale === 'th' ? item.headlineTh : item.headlineEn;
         const detail = locale === 'th' ? item.bodyTh : item.bodyEn;
@@ -25,30 +22,31 @@ export default async function News() {
             slug: item.slug,
             createdAt: item.createdAt,
             title: title || "Untitled",
-            detail: detail ? detail.substring(0, 100) + "..." : "", // ตัดข้อความให้สั้นลง
+            detail: detail ? detail.substring(0, 100) + "..." : "",
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             }),
-            img: item.featuredImage || "/placeholder.png" // ถ้ารูปไม่มีให้ใส่รูปสำรอง
+            img: item.featuredImage || "/placeholder.png"
         };
     });
 
     return (
         <section className="py-20">
             <div className="container mx-auto px-4">
-                <h2 className="text-4xl font-bold text-primary text-center mb-12 font-prompt max-md:text-3xl">
+                {/* Section title fade up — ใช้ CSS animation แทนเพราะเป็น server component */}
+                <h2 className="text-4xl font-bold text-primary text-center mb-12 font-prompt max-md:text-3xl animate-fade-up">
                     {t('title')}
                 </h2>
 
-                {/* แสดงผลข่าว */}
                 {newsItems.length === 0 ? (
                     <div className="text-center text-gray-400 py-10">
                         {locale === 'th' ? 'ยังไม่มีข่าวสารใหม่ในขณะนี้' : 'No recent news available.'}
                     </div>
                 ) : (
                     <div className="grid grid-cols-4 gap-6 mb-12 max-md:grid-cols-1 max-md:gap-8">
-                        {newsItems.map((news) => (
-                            <NewsCard key={news.id} {...news} />
+                        {newsItems.map((news, index) => (
+                            // ส่ง index เพื่อให้ NewsCard animate แบบ stagger
+                            <NewsCard key={news.id} {...news} index={index} />
                         ))}
                     </div>
                 )}

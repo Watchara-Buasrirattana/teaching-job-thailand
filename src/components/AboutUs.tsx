@@ -1,30 +1,55 @@
+'use client';
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
 
 export default function AboutUs() {
-    const t = useTranslations("AboutUs")
+    const t = useTranslations("AboutUs");
 
     return (
         <section className="py-20 bg-white">
             <div className="container mx-auto px-4 text-center">
-                <h2 className="text-4xl font-bold text-primary mb-6 max-md:text-3xl">{t('title')}</h2>
-                <p className="max-w-7xl mx-auto text-base leading-relaxed mb-12 max-md:text-xs whitespace-pre-line">
-                    {t('detail')}
-                </p>
+                {/* หัวข้อ fade up */}
+                <motion.h2
+                    className="text-4xl font-bold text-primary mb-6 max-md:text-3xl"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                >
+                    {t('title')}
+                </motion.h2>
 
-                {/* Grid รูปภาพ: Desktop 4 คอลัมน์ / Mobile 2 คอลัมน์ */}
+                {/* เนื้อหา fade up */}
+                <motion.p
+                    className="max-w-7xl mx-auto text-base leading-relaxed mb-12 max-md:text-xs whitespace-pre-line"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    {t('detail')}
+                </motion.p>
+
+                {/* รูปภาพ stagger ทีละอัน */}
                 <div className="grid grid-cols-4 gap-4 max-md:grid-cols-2">
-                    {[1, 2, 3, 4].map((id) => (
-                        /* สำคัญมาก: ต้องมี relative เพื่อให้ Image fill ไม่ล้นออกไปนอกกรอบ */
-                        <div key={id} className="relative aspect-[3/4] overflow-hidden rounded-sm shadow-md">
+                    {[1, 2, 3, 4].map((id, index) => (
+                        <motion.div
+                            key={id}
+                            className="relative aspect-[3/4] overflow-hidden rounded-sm shadow-md"
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
                             <Image
-                                src={`/pic${id}.png`} // ใช้ id เพื่อให้รูปไม่ซ้ำกันถ้าคุณมีหลายไฟล์
+                                src={`/pic${id}.png`}
                                 alt="Activity"
                                 fill
-                                sizes="(max-width: 768px) 50vw, 25vw" // ช่วยเรื่อง performance
+                                sizes="(max-width: 768px) 50vw, 25vw"
                                 className="object-cover hover:scale-105 transition-transform duration-500"
                             />
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>
