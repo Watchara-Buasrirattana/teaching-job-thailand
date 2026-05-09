@@ -9,10 +9,9 @@ export default function ContactPage() {
     const t2 = useTranslations("Contact");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false); // เพิ่มสถานะ Loading
-    const [agreement, setAgreement] = useState(false); // ไว้เช็คการติ๊กถูก
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [agreement, setAgreement] = useState(false);
 
-    // สร้าง Ref สำหรับไฟล์ (เอาไว้สั่งให้คลิกปุ่มแล้วไปเปิดหน้าเลือกไฟล์)
     const resumeRef = useRef<HTMLInputElement>(null);
     const coverLetterRef = useRef<HTMLInputElement>(null);
     const [resumeName, setResumeName] = useState("");
@@ -20,29 +19,35 @@ export default function ContactPage() {
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
+    // ลบไฟล์ Resume
+    const handleRemoveResume = () => {
+        setResumeName("");
+        if (resumeRef.current) resumeRef.current.value = "";
+    };
+
+    // ลบไฟล์ Cover Letter
+    const handleRemoveCoverLetter = () => {
+        setCoverLetterName("");
+        if (coverLetterRef.current) coverLetterRef.current.value = "";
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
 
         const newErrors: { [key: string]: string } = {};
-        if (!resumeName) {
-            newErrors.resume = t2('errorResume');
-        }
-        if (!agreement) {
-            newErrors.agreement = t2('errorAgreement');
-        }
+        if (!resumeName) newErrors.resume = t2('errorResume');
+        if (!agreement) newErrors.agreement = t2('errorAgreement');
         setErrors(newErrors);
         if (Object.keys(newErrors).length > 0) {
             setIsSubmitting(false);
             return;
         }
 
-
-        // 1. 👉 ดึง form เก็บไว้ในตัวแปรก่อนเลย (ก่อนที่จะไปทำ await)
         const form = e.currentTarget;
 
         try {
-            const formData = new FormData(form); // ใช้ตัวแปร form แทน e.currentTarget
+            const formData = new FormData(form);
 
             const res = await fetch('/api/contact', {
                 method: 'POST',
@@ -53,13 +58,10 @@ export default function ContactPage() {
 
             if (result.success) {
                 setIsModalOpen(true);
-
-                // 2. 👉 สั่งล้างข้อมูลโดยใช้ตัวแปร form
                 form.reset();
-
                 setResumeName("");
                 setCoverLetterName("");
-                setAgreement(false); // แถม: เคลียร์ติ๊กถูกให้ด้วยครับ
+                setAgreement(false);
             } else {
                 alert("เกิดข้อผิดพลาด: " + result.message);
             }
@@ -92,7 +94,6 @@ export default function ContactPage() {
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12 md:col-span-2">
                             <label className="block text-sm font-bold mb-2">{t2('titleName')}<span className="text-red-500"> * </span></label>
-                            {/* เพิ่ม name="..." เพื่อให้ FormData ดึงข้อมูลได้ */}
                             <select name="title" className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-primary/20" required>
                                 <option value="">{t2('select')}</option>
                                 <option value="Mr.">{t2('mr')}</option>
@@ -122,7 +123,7 @@ export default function ContactPage() {
                         </div>
                     </div>
 
-                    {/* ส่วนอัปโหลดไฟล์ Resume */}
+                    {/* Resume */}
                     <div>
                         <label className="block text-sm font-bold mb-2">Resume (PDF)<span className="text-red-500"> * </span></label>
                         <input
@@ -133,12 +134,25 @@ export default function ContactPage() {
                             className="hidden"
                             onChange={(e) => {
                                 setResumeName(e.target.files?.[0]?.name || "");
-                                if (e.target.files?.[0]) setErrors(prev => ({ ...prev, resume: "" })); // ล้าง error เมื่อเลือกไฟล์
+                                if (e.target.files?.[0]) setErrors(prev => ({ ...prev, resume: "" }));
                             }}
                         />
                         <div className={`flex gap-2 ${errors.resume ? 'ring-2 ring-red-500 rounded-lg' : ''}`}>
-                            <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-500 text-sm flex items-center bg-gray-50">
-                                {resumeName || <span className="text-gray-400">{t2('upload')}</span>}
+                            <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-500 text-sm flex items-center justify-between bg-gray-50">
+                                <span className={resumeName ? "text-gray-700" : "text-gray-400"}>
+                                    {resumeName || t2('upload')}
+                                </span>
+                                {/* ปุ่ม X ลบไฟล์ */}
+                                {resumeName && (
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveResume}
+                                        className="text-gray-400 hover:text-red-500 transition-colors text-3xl leading-none"
+                                        aria-label="Remove file"
+                                    >
+                                        ×
+                                    </button>
+                                )}
                             </div>
                             <button
                                 type="button"
@@ -151,7 +165,7 @@ export default function ContactPage() {
                         {errors.resume && <p className="text-red-500 text-xs mt-1">{errors.resume}</p>}
                     </div>
 
-                    {/* ส่วนอัปโหลดไฟล์ Cover Letter */}
+                    {/* Cover Letter */}
                     <div>
                         <label className="block text-sm font-bold mb-2">Cover Letter (PDF)</label>
                         <input
@@ -163,8 +177,21 @@ export default function ContactPage() {
                             onChange={(e) => setCoverLetterName(e.target.files?.[0]?.name || "")}
                         />
                         <div className="flex gap-2">
-                            <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-500 text-sm flex items-center bg-gray-50">
-                                {coverLetterName || <span className="text-gray-400">{t2('upload')}</span>}
+                            <div className="flex-1 border border-gray-300 rounded-lg p-3 text-gray-500 text-sm flex items-center justify-between bg-gray-50">
+                                <span className={coverLetterName ? "text-gray-700" : "text-gray-400"}>
+                                    {coverLetterName || t2('upload')}
+                                </span>
+                                {/* ปุ่ม X ลบไฟล์ */}
+                                {coverLetterName && (
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveCoverLetter}
+                                        className="text-gray-400 hover:text-red-500 transition-colors text-3xl leading-none"
+                                        aria-label="Remove file"
+                                    >
+                                        ×
+                                    </button>
+                                )}
                             </div>
                             <button
                                 type="button"
@@ -197,10 +224,9 @@ export default function ContactPage() {
                     {/* ปุ่มส่งข้อมูล */}
                     <div className="flex justify-center pt-6">
                         <div className={`relative group w-full md:w-auto ${(!agreement || isSubmitting) ? 'cursor-not-allowed' : ''}`}>
-
                             <button
                                 type="submit"
-                                disabled={true} //{!agreement || isSubmitting}
+                                disabled={!agreement || isSubmitting}
                                 className="bg-primary text-white px-20 py-4 rounded-full text-xl font-bold hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto disabled:bg-gray-300 disabled:text-gray-500 disabled:pointer-events-none"
                             >
                                 {isSubmitting ? t2('sending') : t2('submit')}
@@ -214,7 +240,6 @@ export default function ContactPage() {
                             )}
                         </div>
                     </div>
-
                 </form>
             </div>
 
