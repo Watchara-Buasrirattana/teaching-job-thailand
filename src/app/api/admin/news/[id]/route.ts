@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { uploadFile, deleteFile } from '@/lib/upload'
+import { uploadFile, uploadGalleryFiles, deleteFile } from '@/lib/upload'
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
 
@@ -54,16 +54,8 @@ export async function PUT(
             await deleteFile(img);
         }
 
-        const newGalleryPaths: string[] = [];
         const galleryFiles = formData.getAll('galleryImages') as File[];
-
-        for (let i = 0; i < galleryFiles.length; i++) {
-            const file = galleryFiles[i];
-            if (file && file.size > 0) {
-                const url = await uploadFile(file, `gallery_${i}`, 'news');
-                newGalleryPaths.push(url);
-            }
-        }
+        const newGalleryPaths = await uploadGalleryFiles(galleryFiles, 'news');
 
         const finalGallery = [...keptGallery, ...newGalleryPaths];
 
@@ -82,7 +74,7 @@ export async function PUT(
             action: "UPDATE",
             entity: "News",
             entityId: updatedNews.id,
-            details: `แก้ไขข่าว: ${updatedNews.headlineTh}`
+            details: `แก้ไขข่าว: ${updatedNews.headlineTh || updatedNews.headlineEn || "Untitled"}`
         });
 
         return NextResponse.json({ success: true, data: updatedNews });

@@ -1,7 +1,7 @@
 import { logAdminAction } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { uploadFile } from '@/lib/upload'
+import { uploadFile, uploadGalleryFiles } from '@/lib/upload'
 import { cookies } from 'next/headers';
 
 // ดึงข้อมูลข่าวทั้งหมด
@@ -36,15 +36,8 @@ export async function POST(request: Request) {
         }
 
         // 3. จัดการรูปแกลลอรี่ (ดึงไฟล์ทั้งหมดที่ส่งมาด้วยชื่อ 'galleryImages')
-        const galleryPaths: string[] = [];
         const galleryFiles = formData.getAll('galleryImages') as File[];
-        for (let i = 0; i < galleryFiles.length; i++) {
-            const file = galleryFiles[i];
-            if (file && file.size > 0) {
-                const url = await uploadFile(file, `gallery_${i}`, 'news');
-                galleryPaths.push(url);
-            }
-        }
+        const galleryPaths = await uploadGalleryFiles(galleryFiles, 'news');
 
         let baseSlug = "untitled";
 
