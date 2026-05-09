@@ -34,13 +34,13 @@ const metadataByLocale: Record<string, Metadata> = {
             siteName: 'Teaching Job Thailand',
             title: 'Teaching Job Thailand | Foreign Teacher Recruitment',
             description: 'Full-service foreign teacher recruitment for schools in Thailand.',
-            images: [{ url: `${BASE_URL}/og-image.jpg`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
+            images: [{ url: `${BASE_URL}/placeholder.png`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
         },
         twitter: {
             card: 'summary_large_image',
             title: 'Teaching Job Thailand',
             description: 'Full-service foreign teacher recruitment for schools in Thailand.',
-            images: [`${BASE_URL}/og-image.jpg`],
+            images: [`${BASE_URL}/placeholder.png`],
         },
         alternates: {
             canonical: BASE_URL,
@@ -62,7 +62,7 @@ const metadataByLocale: Record<string, Metadata> = {
             siteName: 'Teaching Job Thailand',
             title: 'Teaching Job Thailand | บริการครูต่างชาติครบวงจร',
             description: 'บริการจัดหาครูต่างชาติครบวงจร ดูแลวีซ่าและใบอนุญาตทำงาน',
-            images: [{ url: `${BASE_URL}/og-image.jpg`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
+            images: [{ url: `${BASE_URL}/placeholder.png`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
         },
         alternates: {
             canonical: `${BASE_URL}/th`,

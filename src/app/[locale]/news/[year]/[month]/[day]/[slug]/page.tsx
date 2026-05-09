@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     const isThai = locale === 'th';
     const title = isThai ? (newsItem.headlineTh || newsItem.headlineEn) : (newsItem.headlineEn || newsItem.headlineTh);
     const description = isThai ? newsItem.bodyTh : newsItem.bodyEn;
-    const image = newsItem.featuredImage || `${BASE_URL}/og-image.jpg`;
+    const image = newsItem.featuredImage || `${BASE_URL}/placeholder.png`;
 
     const d = new Date(newsItem.createdAt);
     const urlPath = `/${locale}/news/${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}/${decodedSlug}`;
