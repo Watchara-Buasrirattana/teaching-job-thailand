@@ -14,9 +14,10 @@ const prompt = Prompt({
     weight: ['300', '400', '500', '600', '700'],
     subsets: ["latin", "thai"],
     variable: "--font-prompt",
+    display: "swap",
 });
 
-const BASE_URL = 'https://teachingjobthailand.com';
+const BASE_URL = 'https://www.teachingjobthailand.com'
 
 // Metadata แยกตามภาษา
 const metadataByLocale: Record<string, Metadata> = {
@@ -43,8 +44,11 @@ const metadataByLocale: Record<string, Metadata> = {
             images: [`${BASE_URL}/placeholder.png`],
         },
         alternates: {
-            canonical: BASE_URL,
-            languages: { 'en': `${BASE_URL}/en`, 'th': `${BASE_URL}/th` },
+            canonical: `${BASE_URL}/en`,   // เปลี่ยนจาก BASE_URL เป็น BASE_URL/en
+            languages: {
+                'en': `${BASE_URL}/en`,
+                'th': `${BASE_URL}/th`,
+            },
         },
         robots: { index: true, follow: true },
     },

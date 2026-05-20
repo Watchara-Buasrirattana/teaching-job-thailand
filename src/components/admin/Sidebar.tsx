@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { MdOutlineSpaceDashboard, MdContentCopy, MdLogout, MdOutlineHistory } from 'react-icons/md';
 import { BiUserPlus, BiGroup } from 'react-icons/bi';
 import { FaRegCommentAlt } from 'react-icons/fa';
+import Image from 'next/image';
 
 export default function Sidebar() {
     const pathname = usePathname();
@@ -60,7 +61,7 @@ export default function Sidebar() {
             <div className="h-24 flex items-center justify-center border-b border-white/10 p-4">
                 <div className="text-center">
                     {/* ตรงนี้ใส่โลโก้ PKP ของคุณได้เลย */}
-                    <h1 className="font-bold text-xl tracking-wider">PKP<br /><span className="text-xs font-normal">English Co.,Ltd.</span></h1>
+                    <Image src="/w-logo.png" alt="Teaching Job Thailand Logo" width={250} height={100} priority className="object-contain" />
                 </div>
             </div>
 
@@ -95,7 +96,7 @@ export default function Sidebar() {
                         <p className="text-xs text-gray-500">Admin</p>
                     </div>
                 </div>
-                <button onClick={handleLogout} className="text-primary hover:text-red-600 transition p-2">
+                <button onClick={handleLogout} aria-label="Logout" className="text-primary hover:text-red-600 transition p-2">
                     <MdLogout size={24} />
                 </button>
             </div>

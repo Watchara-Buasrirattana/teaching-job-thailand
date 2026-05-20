@@ -38,7 +38,7 @@ export default function Features() {
                     <motion.div key={index} className="flex gap-4" variants={itemVariants}>
                         <div className="w-12 bg-accent shrink-0"></div>
                         <div>
-                            <h3 className="font-bold mb-4 leading-tight whitespace-pre-line">{item.title}</h3>
+                            <p className="font-bold mb-4 leading-tight whitespace-pre-line">{item.title}</p>
                             <p className="text-xs whitespace-pre-line">{item.detail}</p>
                         </div>
                     </motion.div>

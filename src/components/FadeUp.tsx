@@ -1,17 +1,20 @@
-'use client';
-import { motion } from 'framer-motion';
-import { ReactNode } from 'react';
+'use client'
+import dynamic from 'next/dynamic'
+import { ReactNode } from 'react'
+const MotionDiv = dynamic(
+    () => import('framer-motion').then(m => m.motion.div),
+    { ssr: false }
+)
 
 interface FadeUpProps {
-    children: ReactNode;
-    delay?: number;
-    className?: string;
+    children: ReactNode
+    delay?: number
+    className?: string
 }
 
-// Component กลางสำหรับ fade up — ใช้ซ้ำได้ทุกหน้า
 export default function FadeUp({ children, delay = 0, className }: FadeUpProps) {
     return (
-        <motion.div
+        <MotionDiv
             className={className}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -19,6 +22,6 @@ export default function FadeUp({ children, delay = 0, className }: FadeUpProps) 
             transition={{ duration: 0.6, delay }}
         >
             {children}
-        </motion.div>
-    );
+        </MotionDiv>
+    )
 }

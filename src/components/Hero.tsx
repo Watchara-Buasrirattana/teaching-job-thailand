@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
+import { Link } from '@/i18n/routing'
 
 export default function Hero() {
     const t = useTranslations('Hero');
@@ -16,7 +17,7 @@ export default function Hero() {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <Image src="/hero-teachers.png" alt="Teachers" fill className="object-cover object-[100%_62%] pt-4" />
+                    <Image src="/hero-teachers.png" alt="Teachers" fill priority className="object-cover object-[100%_62%] pt-4" />
                 </motion.div>
 
                 {/* ฝั่งขวา: ข้อความ — fade up ทีละบรรทัด */}
@@ -38,17 +39,18 @@ export default function Hero() {
                     >
                         {t('detail')}
                     </motion.p>
-
-                    <motion.button
-                        className="bg-accent text-primary px-8 py-2 rounded-full font-bold cursor-pointer transition hover:scale-105"
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.6 }}
-                        whileHover={{ scale: 1.08 }}
-                        whileTap={{ scale: 0.95 }}
-                    >
-                        {t('contactUs')}
-                    </motion.button>
+                    <Link href="/contact">
+                        <motion.button
+                            className="bg-accent text-primary px-8 py-2 rounded-full font-bold cursor-pointer transition hover:scale-105"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.8 }}
+                            whileHover={{ scale: 1.08 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            {t('contactUs')}
+                        </motion.button>
+                    </Link>
                 </div>
             </div>
         </section>

@@ -72,7 +72,7 @@ export default function Navbar() {
                                 </Link>
                             </li>
                             <li>
-                                <button onClick={toggleLanguage} className="bg-accent text-primary text-xl py-2 px-6 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-md max-2xl:text-base">
+                                <button onClick={toggleLanguage} aria-label="เปลี่ยนภาษา / Change language" className="bg-accent text-primary text-xl py-2 px-6 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-md max-2xl:text-base">
                                     ไทย/EN
                                 </button>
                             </li>
@@ -107,6 +107,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-end p-6 border-b border-gray-100">
                     <button 
                         onClick={() => setIsMobileMenuOpen(false)}
+                        aria-label="Close menu"
                         className="p-2 text-gray-400 hover:text-primary transition bg-gray-50 rounded-full"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +133,7 @@ export default function Navbar() {
                     <Link className="bg-primary text-white text-center text-xl transition hover:bg-blue-900 py-3 rounded-full shadow-md" href="/contact" onClick={() => setIsMobileMenuOpen(false)}>
                         {t('contact')}
                     </Link>
-                    <button onClick={toggleLanguage} className="bg-accent text-primary text-xl py-3 rounded-full font-bold transition shadow-md w-full">
+                    <button onClick={toggleLanguage} aria-label="เปลี่ยนภาษา / Change language" className="bg-accent text-primary text-xl py-3 rounded-full font-bold transition shadow-md w-full">
                         ไทย/EN
                     </button>
                 </nav>

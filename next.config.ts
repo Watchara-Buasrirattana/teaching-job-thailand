@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
     images: {
+        formats: ['image/avif', 'image/webp'],
         remotePatterns: [
             {
                 protocol: 'https',
@@ -16,6 +17,7 @@ const nextConfig: NextConfig = {
         serverActions: {
             bodySizeLimit: '20mb',
         },
+        optimizePackageImports: ['lucide-react', 'react-icons', 'framer-motion'],
     },
 }
 

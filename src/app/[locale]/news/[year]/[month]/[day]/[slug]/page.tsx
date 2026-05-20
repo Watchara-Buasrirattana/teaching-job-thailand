@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import prisma from "@/lib/prisma";
 
-const BASE_URL = 'https://teachingjobthailand.com';
+const BASE_URL = 'https://www.teachingjobthailand.com';
 
 type Params = Promise<{ year: string; month: string; day: string; slug: string; locale: string }>;
 
@@ -21,7 +21,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
     const isThai = locale === 'th';
     const title = isThai ? (newsItem.headlineTh || newsItem.headlineEn) : (newsItem.headlineEn || newsItem.headlineTh);
-    const description = isThai ? newsItem.bodyTh : newsItem.bodyEn;
+    const rawDesc = isThai ? newsItem.bodyTh : newsItem.bodyEn
+    const cleanDesc = rawDesc?.replace(/<[^>]*>/g, '') ?? ''
+    const description = cleanDesc.substring(0, 160)
     const image = newsItem.featuredImage || `${BASE_URL}/placeholder.png`;
 
     const d = new Date(newsItem.createdAt);
