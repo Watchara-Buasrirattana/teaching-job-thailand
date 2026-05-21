@@ -17,7 +17,7 @@ export default function Footer() {
                     {/* Logo */}
                     <Link href="/" className="shrink-0">
                         <Image 
-                            src="/w-logo.png" 
+                            src="/w-logo.webp" 
                             alt="Logo" 
                             width={130} 
                             height={113} 

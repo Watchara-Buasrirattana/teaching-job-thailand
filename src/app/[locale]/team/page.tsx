@@ -47,7 +47,7 @@ export default async function TeamPage({
         text: r.content,
         name: `${r.teacher.title || ''} ${r.teacher.fName} ${r.teacher.lName}`.trim(),
         country: r.teacher.country || 'ไม่ระบุประเทศ',
-        image: r.teacher.image || '/teacher.png',
+        image: r.teacher.image || '/teacher.webp',
         rating: r.rating
     }));
 

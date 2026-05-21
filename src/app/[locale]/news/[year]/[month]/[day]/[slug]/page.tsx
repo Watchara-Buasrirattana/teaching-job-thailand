@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     const rawDesc = isThai ? newsItem.bodyTh : newsItem.bodyEn
     const cleanDesc = rawDesc?.replace(/<[^>]*>/g, '') ?? ''
     const description = cleanDesc.substring(0, 160)
-    const image = newsItem.featuredImage || `${BASE_URL}/placeholder.png`;
+    const image = newsItem.featuredImage || `${BASE_URL}/placeholder.webp`;
 
     const d = new Date(newsItem.createdAt);
     const urlPath = `/${locale}/news/${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}/${decodedSlug}`;

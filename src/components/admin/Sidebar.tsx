@@ -61,7 +61,7 @@ export default function Sidebar() {
             <div className="h-24 flex items-center justify-center border-b border-white/10 p-4">
                 <div className="text-center">
                     {/* ตรงนี้ใส่โลโก้ PKP ของคุณได้เลย */}
-                    <Image src="/w-logo.png" alt="Teaching Job Thailand Logo" width={250} height={100} priority className="object-contain" />
+                    <Image src="/w-logo.webp" alt="Teaching Job Thailand Logo" width={250} height={100} priority className="object-contain" />
                 </div>
             </div>
 

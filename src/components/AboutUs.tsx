@@ -43,7 +43,7 @@ export default function AboutUs() {
                             transition={{ duration: 0.5, delay: index * 0.1 }}
                         >
                             <Image
-                                src={`/pic${id}.png`}
+                                src={`/pic${id}.webp`}
                                 alt="Activity"
                                 fill
                                 sizes="(max-width: 768px) 50vw, 25vw"

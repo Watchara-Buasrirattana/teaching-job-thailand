@@ -38,7 +38,7 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <Link className="text-primary font-black text-2xl" href="/">
                             <Image 
-                                src={`/logo.png`} 
+                                src={`/logo.webp`} 
                                 alt='Teaching Job Thailand Logo' 
                                 width={130} 
                                 height={113} 

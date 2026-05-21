@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { FiSearch, FiTrash2, FiEdit, FiEye, FiEyeOff, FiPlus, FiX } from 'react-icons/fi';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { BiSortAlt2 } from 'react-icons/bi';
+import { convertToWebP } from '@/lib/imageUtils';
 
 export default function TeachersPage() {
     const [teachers, setTeachers] = useState<any[]>([]);
@@ -129,11 +130,12 @@ export default function TeachersPage() {
     };
 
     // --- Action Handlers ---
-    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setPhoto(file);
-            setPhotoPreview(URL.createObjectURL(file));
+            const webpFile = await convertToWebP(file);
+            setPhoto(webpFile);
+            setPhotoPreview(URL.createObjectURL(webpFile));
         }
     };
 

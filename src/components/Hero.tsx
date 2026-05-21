@@ -17,7 +17,7 @@ export default function Hero() {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.8 }}
                 >
-                    <Image src="/hero-teachers.png" alt="Teachers" fill priority className="object-cover object-[100%_62%] pt-4" />
+                    <Image src="/hero-teachers.webp" alt="Teachers" fill priority fetchPriority="high" className="object-cover object-[100%_62%] pt-4" />
                 </motion.div>
 
                 {/* ฝั่งขวา: ข้อความ — fade up ทีละบรรทัด */}

@@ -14,12 +14,13 @@ export async function POST(request: Request) {
         // สร้าง Response
         const response = NextResponse.json({ success: true });
 
-        // ฝาก Cookie ชื่อ 'admin_token' ไว้ (ในระบบจริงควรใช้ JWT ที่เข้ารหัส)
         // การตั้ง httpOnly: true จะทำให้ JavaScript ฝั่ง Client แอบอ่านค่านี้ไม่ได้ (ปลอดภัยจาก Hacker)
         (await cookies()).set('admin_token', admin.id.toString(), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
             path: '/',
+            maxAge: 60 * 60 * 8, // 8 ชั่วโมง
         });
 
         return response;

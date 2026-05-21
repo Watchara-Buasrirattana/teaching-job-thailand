@@ -26,7 +26,7 @@ export default async function News() {
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             }),
-            img: item.featuredImage || "/placeholder.png"
+            img: item.featuredImage || "/placeholder.webp"
         };
     });
 

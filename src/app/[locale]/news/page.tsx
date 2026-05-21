@@ -41,7 +41,7 @@ export default async function NewsPage({
             date: new Date(item.createdAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {
                 year: 'numeric', month: 'short', day: 'numeric'
             }),
-            img: item.featuredImage || "/defaultImageContent.png"
+            img: item.featuredImage || "/placeholder.webp"
         };
     });
 

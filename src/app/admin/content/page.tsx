@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { FiSearch, FiTrash2, FiEdit, FiPlus, FiX, FiCheck, FiAlertTriangle } from 'react-icons/fi';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
+import { convertToWebP, convertAllToWebP } from '@/lib/imageUtils';
 
 export default function NewsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,19 +126,21 @@ export default function NewsPage() {
     };
 
     // 5. เลือกรูปปก
-    const handleFeaturedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFeaturedChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setFeaturedImage(file);
-            setFeaturedPreview(URL.createObjectURL(file));
+            const webpFile = await convertToWebP(file);
+            setFeaturedImage(webpFile);
+            setFeaturedPreview(URL.createObjectURL(webpFile));
             setIsFormDirty(true);
         }
     };
 
     // 6. เลือกรูป Gallery
-    const handleGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleGalleryChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            const newFiles = Array.from(e.target.files);
+            const rawFiles = Array.from(e.target.files);
+            const newFiles = await convertAllToWebP(rawFiles);
             setGalleryImages(prev => {
                 const combined = [...prev, ...newFiles];
                 if (existingGallery.length + combined.length > 4) {
@@ -303,10 +306,10 @@ export default function NewsPage() {
                                             <span className={`italic ${news.status === 'Published' ? 'text-primary' : 'text-accent'}`}>{news.status}</span>
                                         </td>
                                         <td className="py-3 px-4 text-center">
-                                            <button onClick={() => handleEdit(news.id)} className="text-primary hover:scale-110 transition-transform mr-3">
+                                            <button onClick={() => handleEdit(news.id)} className="text-primary hover:scale-110 transition-transform mr-3" title="Edit">
                                                 <FiEdit size={16} />
                                             </button>
-                                            <button onClick={() => handleDeleteClick(news)} className="text-red-500 hover:scale-110 transition-transform">
+                                            <button onClick={() => handleDeleteClick(news)} className="text-primary hover:text-red-500 hover:scale-110 transition-transform" title="Delete">
                                                 <FiTrash2 size={16} />
                                             </button>
                                         </td>

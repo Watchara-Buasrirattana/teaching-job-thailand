@@ -14,7 +14,7 @@ const prompt = Prompt({
     weight: ['300', '400', '500', '600', '700'],
     subsets: ["latin", "thai"],
     variable: "--font-prompt",
-    display: "swap",
+    display: 'swap',
 });
 
 const BASE_URL = 'https://www.teachingjobthailand.com'
@@ -35,13 +35,13 @@ const metadataByLocale: Record<string, Metadata> = {
             siteName: 'Teaching Job Thailand',
             title: 'Teaching Job Thailand | Foreign Teacher Recruitment',
             description: 'Full-service foreign teacher recruitment for schools in Thailand.',
-            images: [{ url: `${BASE_URL}/placeholder.png`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
+            images: [{ url: `${BASE_URL}/placeholder.webp`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
         },
         twitter: {
             card: 'summary_large_image',
             title: 'Teaching Job Thailand',
             description: 'Full-service foreign teacher recruitment for schools in Thailand.',
-            images: [`${BASE_URL}/placeholder.png`],
+            images: [`${BASE_URL}/placeholder.webp`],
         },
         alternates: {
             canonical: `${BASE_URL}/en`,   // เปลี่ยนจาก BASE_URL เป็น BASE_URL/en
@@ -66,7 +66,7 @@ const metadataByLocale: Record<string, Metadata> = {
             siteName: 'Teaching Job Thailand',
             title: 'Teaching Job Thailand | บริการครูต่างชาติครบวงจร',
             description: 'บริการจัดหาครูต่างชาติครบวงจร ดูแลวีซ่าและใบอนุญาตทำงาน',
-            images: [{ url: `${BASE_URL}/placeholder.png`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
+            images: [{ url: `${BASE_URL}/placeholder.webp`, width: 1200, height: 630, alt: 'Teaching Job Thailand' }],
         },
         alternates: {
             canonical: `${BASE_URL}/th`,
