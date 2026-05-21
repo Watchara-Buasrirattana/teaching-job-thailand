@@ -42,7 +42,7 @@ export default async function ActivityLogPage() {
                                 </td>
                                 <td className="p-4 text-gray-600">{log.details}</td>
                                 <td className="p-4 text-gray-400">
-                                    {new Date(log.createdAt).toLocaleString('th-TH')}
+                                    {new Date(log.createdAt).toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })}
                                 </td>
                             </tr>
                         ))}
