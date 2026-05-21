@@ -14,7 +14,7 @@ function isValidToken(token: string | undefined): boolean {
     return !isNaN(id) && id > 0 && Number.isInteger(id);
 }
 
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
     if (pathname === '/admin') {
