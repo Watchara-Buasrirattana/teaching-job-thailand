@@ -17,6 +17,13 @@ function isValidToken(token: string | undefined): boolean {
 export default function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
+    if (pathname === '/admin') {
+        const adminToken = request.cookies.get('admin_token')?.value;
+        const isAuthenticated = isValidToken(adminToken);
+        const target = isAuthenticated ? '/admin/dashboard' : '/admin/login';
+        return NextResponse.redirect(new URL(target, request.url));
+    }
+
     if (pathname.startsWith('/admin')) {
         const adminToken = request.cookies.get('admin_token')?.value;
         const isAuthenticated = isValidToken(adminToken);
@@ -44,6 +51,7 @@ export const config = {
     matcher: [
         '/',
         '/(th|en)/:path*',
+        '/admin',
         '/admin/:path*'
     ]
 };
