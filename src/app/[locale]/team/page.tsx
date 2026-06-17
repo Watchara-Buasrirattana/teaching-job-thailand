@@ -3,6 +3,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import TeacherCard from "@/components/TeacherCard";
 import Pagination from "@/components/Pagination";
 import ReviewCard from "@/components/ReviewCard";
+import ReviewCarousel from '@/components/Reviewcarousel';
 import FadeUp from "@/components/FadeUp";
 import { getTranslations } from "next-intl/server";
 import prisma from "@/lib/prisma";
@@ -20,7 +21,7 @@ export default async function TeamPage({
     const schoolsList = t.raw("schoolsList");
     const honoredList = t.raw("honoredList");
 
-    const itemsPerPage = 5;
+    const itemsPerPage = 4;
     const currentPage = Number(resolvedSearchParams.page) || 1;
 
     const totalTeachers = await prisma.teacher.count({ where: { status: 'Active' } });
@@ -39,7 +40,6 @@ export default async function TeamPage({
             teacher: { select: { title: true, fName: true, lName: true, country: true, image: true } }
         },
         orderBy: { createdAt: 'desc' },
-        take: 3
     });
 
     const reviews = dbReviews.map((r) => ({
@@ -72,7 +72,7 @@ export default async function TeamPage({
                 {displayedTeachers.length === 0 ? (
                     <div className="text-center py-10 text-gray-400">{t('noDataTeacher')}</div>
                 ) : (
-                    <div className="grid grid-cols-5 gap-4 mb-10 max-md:grid-cols-2">
+                    <div className="grid grid-cols-4 gap-4 mb-10 max-md:grid-cols-2">
                         {displayedTeachers.map((teacher, index) => (
                             <TeacherCard
                                 key={teacher.id}
@@ -106,11 +106,7 @@ export default async function TeamPage({
                                 ยังไม่มีรีวิวในขณะนี้
                             </div>
                         ) : (
-                            <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1">
-                                {reviews.map((item, index) => (
-                                    <ReviewCard key={index} {...item} index={index} />
-                                ))}
-                            </div>
+                            <ReviewCarousel reviews={reviews} dragHint={t('dragHint')} />
                         )}
                     </div>
                 </section>
