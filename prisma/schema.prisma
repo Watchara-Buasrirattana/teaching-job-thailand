@@ -56,6 +56,7 @@ model Teacher {
   workPermitNumber     String?
   workPermitExpiryDate DateTime? // วันหมดอายุ Work Permit
   status               String    @default("Active") // "Active", "Processing", "Warning", "Urgent"
+  isVisible            Boolean   @default(true) // แสดงบนหน้า public team page หรือไม่
   docReady             Boolean   @default(false) // เตรียมเอกสาร (Ready)
   docSigned            Boolean   @default(false) // สังกัดเซ็นแล้ว (Signed)
   docSubmitted         Boolean   @default(false) // ยื่นแล้ว (Submitted)

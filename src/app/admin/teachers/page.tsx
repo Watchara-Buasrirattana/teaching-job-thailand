@@ -40,7 +40,8 @@ export default function TeachersPage() {
         visaExpiryDate: '',
         workPermitNumber: '',
         workPermitExpiryDate: '',
-        status: 'Active'
+        status: 'Active',
+        isVisible: true
     };
     const [formData, setFormData] = useState(initialFormState);
 
@@ -170,7 +171,8 @@ export default function TeachersPage() {
             visaExpiryDate: teacher.visaExpiryDate ? teacher.visaExpiryDate.split('T')[0] : '',
             workPermitNumber: teacher.workPermitNumber || '',
             workPermitExpiryDate: teacher.workPermitExpiryDate ? teacher.workPermitExpiryDate.split('T')[0] : '',
-            status: teacher.status || 'Active'
+            status: teacher.status || 'Active',
+            isVisible: teacher.isVisible !== undefined ? teacher.isVisible : true
         });
         setPhoto(null);
         setPhotoPreview(teacher.image || null);
@@ -195,6 +197,7 @@ export default function TeachersPage() {
             data.append('workPermitNumber', formData.workPermitNumber);
             data.append('workPermitExpiryDate', formData.workPermitExpiryDate);
             data.append('status', formData.status);
+            data.append('isVisible', String(formData.isVisible));
             if (photo) data.append('image', photo);
 
             const url = editData ? `/api/admin/teachers/${editData.id}` : '/api/admin/teachers';
@@ -336,6 +339,7 @@ export default function TeachersPage() {
                                         <th className="py-4 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('schoolProject')}>School / Project {getSortIcon('schoolProject')}</th>
                                         <th className="py-4 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('phone')}>Contact {getSortIcon('phone')}</th>
                                         <th className="py-4 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('email')}>Email {getSortIcon('email')}</th>
+                                        <th className="py-4 px-4 font-normal cursor-pointer hover:text-gray-700 select-none" onClick={() => requestSort('isVisible')}>Visible {getSortIcon('isVisible')}</th>
                                     </>
                                 ) : (
                                     <>
@@ -387,6 +391,11 @@ export default function TeachersPage() {
                                                     <td className="py-4 px-4 text-gray-500">{teacher.schoolProject || '-'}</td>
                                                     <td className="py-4 px-4 text-gray-500">{teacher.phone || '-'}</td>
                                                     <td className="py-4 px-4 text-gray-500">{teacher.email || '-'}</td>
+                                                    <td className="py-4 px-4">
+                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${teacher.isVisible ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+                                                            {teacher.isVisible ? 'Visible' : 'Hidden'}
+                                                        </span>
+                                                    </td>
                                                 </>
                                             ) : (
                                                 <>
@@ -484,6 +493,17 @@ export default function TeachersPage() {
 
                         <form onSubmit={handleFormSubmit} className="overflow-y-auto p-8 space-y-8 text-sm text-gray-700">
 
+                            {/* Show on Public Site Toggle */}
+                            <div className="flex items-center justify-between bg-gray-50 border rounded-lg p-4">
+                                <div>
+                                    <p className="font-bold text-primary">Show on Public Site</p>
+                                    <p className="text-xs text-gray-500">แสดง teacher คนนี้บนหน้า Team (public) หรือไม่</p>
+                                </div>
+                                <button type="button" onClick={() => setFormData({ ...formData, isVisible: !formData.isVisible })}
+                                    className={`relative w-14 h-7 rounded-full transition-colors ${formData.isVisible ? 'bg-primary' : 'bg-gray-300'}`}>
+                                    <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${formData.isVisible ? 'translate-x-7' : 'translate-x-0'}`} />
+                                </button>
+                            </div>
                             {/* General Information */}
                             <div className="space-y-4">
                                 <h3 className="text-primary font-bold text-lg border-l-4 border-primary pl-3">General Information</h3>

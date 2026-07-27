@@ -46,6 +46,7 @@ export async function PUT(
                 workPermitNumber: formData.get('workPermitNumber') as string,
                 workPermitExpiryDate: formData.get('workPermitExpiryDate') ? new Date(formData.get('workPermitExpiryDate') as string) : null,
                 status: formData.get('status') as string,
+                isVisible: formData.get('isVisible') === 'true',
             };
 
             // จัดการรูปภาพใหม่ (ถ้ามี)

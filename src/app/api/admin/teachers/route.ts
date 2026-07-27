@@ -34,6 +34,7 @@ export async function POST(request: Request) {
         const workPermitNumber = formData.get('workPermitNumber') as string;
         const workPermitExpiryDate = formData.get('workPermitExpiryDate') as string;
         const status = (formData.get('status') as string) || 'Active';
+        const isVisible = formData.get('isVisible') === 'true';
 
         // จัดการรูปภาพ
         const imageFile = formData.get('image') as File;
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
                 workPermitNumber,
                 workPermitExpiryDate: workPermitExpiryDate ? new Date(workPermitExpiryDate) : null,
                 status,
+                isVisible,
                 image: imagePath
             }
         });

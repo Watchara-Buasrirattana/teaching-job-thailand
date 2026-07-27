@@ -24,11 +24,11 @@ export default async function TeamPage({
     const itemsPerPage = 4;
     const currentPage = Number(resolvedSearchParams.page) || 1;
 
-    const totalTeachers = await prisma.teacher.count({ where: { status: 'Active' } });
+    const totalTeachers = await prisma.teacher.count({ where: { status: 'Active', isVisible: true } });
     const totalPages = Math.ceil(totalTeachers / itemsPerPage);
 
     const displayedTeachers = await prisma.teacher.findMany({
-        where: { status: 'Active' },
+        where: { status: 'Active', isVisible: true },
         orderBy: { createdAt: 'desc' },
         skip: (currentPage - 1) * itemsPerPage,
         take: itemsPerPage,
