@@ -102,13 +102,31 @@ export default function TeachersPage() {
         else setSelectedIds([...selectedIds, id]);
     };
 
+    const handleBulkDelete = async () => {
+        if (!confirm(`ลบ ${selectedIds.length} รายการ?`)) return;
+        try {
+            await Promise.all(selectedIds.map(id => fetch(`/api/admin/teachers/${id}`, { method: 'DELETE' })));
+            setSelectedIds([]);
+            fetchTeachers();
+        } catch (error) {
+            alert("เกิดข้อผิดพลาด");
+        }
+    };
+
     const handleDelete = async (id: string) => {
         if (!confirm("คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลครูท่านนี้?")) return;
         try {
-            await fetch(`/api/admin/teachers/${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/admin/teachers/${id}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (!result.success) {
+                alert(result.message || "ลบไม่สำเร็จ");
+                return;
+            }
             fetchTeachers();
             setViewData(null);
-        } catch (error) { }
+        } catch (error) {
+            alert("เกิดข้อผิดพลาด");
+        }
     };
 
     const getStatusColor = (status: string) => {
@@ -254,28 +272,28 @@ export default function TeachersPage() {
                                 <span>Select all</span>
                             </label>
                             <div className="w-px h-4 bg-gray-300 mx-1"></div>
-                            <button disabled={selectedIds.length === 0} className="text-gray-500 hover:text-red-500 disabled:opacity-30 transition">
+                            <button disabled={selectedIds.length === 0} onClick={() => handleBulkDelete()} className="text-gray-500 hover:text-red-500 disabled:opacity-30 transition">
                                 <FiTrash2 size={16} />
                             </button>
                         </div>
-                            {/* Status Filters */}
-                            <div className="flex items-center gap-4 md:gap-6 font-medium text-sm overflow-x-auto pb-2 md:pb-0">
-                                <button onClick={() => setStatusFilter("All")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${statusFilter === "All" ? "bg-gray-200 text-gray-800" : "text-gray-500 hover:bg-gray-100"}`}>
-                                    All : {counts.All}
-                                </button>
-                                <button onClick={() => setStatusFilter("Urgent")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Urgent')} ${statusFilter === "Urgent" ? "bg-gray-200 text-gray-800" : "hover:bg-gray-100"}`}>
-                                    Urgent : {counts.Urgent}
-                                </button>
-                                <button onClick={() => setStatusFilter("Warning")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Warning')} ${statusFilter === "Warning" ? "bg-gray-200 text-gray-800" : "hover:bg-gray-100"}`}>
-                                    Warning : {counts.Warning}
-                                </button>
-                                <button onClick={() => setStatusFilter("Processing")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Processing')} ${statusFilter === "Processing" ? "bg-gray-200 " : "hover:bg-gray-100"}`}>
-                                    Processing : {counts.Processing}
-                                </button>
-                                <button onClick={() => setStatusFilter("Active")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Active')} ${statusFilter === "Active" ? "bg-gray-200 text-gray-800" : "hover:bg-gray-100"}`}>
-                                    Active : {counts.Active}
-                                </button>
-                            </div>
+                        {/* Status Filters */}
+                        <div className="flex items-center gap-4 md:gap-6 font-medium text-sm overflow-x-auto pb-2 md:pb-0">
+                            <button onClick={() => setStatusFilter("All")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${statusFilter === "All" ? "bg-gray-200 text-gray-800" : "text-gray-500 hover:bg-gray-100"}`}>
+                                All : {counts.All}
+                            </button>
+                            <button onClick={() => setStatusFilter("Urgent")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Urgent')} ${statusFilter === "Urgent" ? "bg-gray-200 text-gray-800" : "hover:bg-gray-100"}`}>
+                                Urgent : {counts.Urgent}
+                            </button>
+                            <button onClick={() => setStatusFilter("Warning")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Warning')} ${statusFilter === "Warning" ? "bg-gray-200 text-gray-800" : "hover:bg-gray-100"}`}>
+                                Warning : {counts.Warning}
+                            </button>
+                            <button onClick={() => setStatusFilter("Processing")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Processing')} ${statusFilter === "Processing" ? "bg-gray-200 " : "hover:bg-gray-100"}`}>
+                                Processing : {counts.Processing}
+                            </button>
+                            <button onClick={() => setStatusFilter("Active")} className={`px-4 py-1.5 rounded-full whitespace-nowrap cursor-pointer ${getStatusColor('Active')} ${statusFilter === "Active" ? "bg-gray-200 text-gray-800" : "hover:bg-gray-100"}`}>
+                                Active : {counts.Active}
+                            </button>
+                        </div>
                     </div>
 
                     {/* ปุ่ม Add Teacher ด้านขวา */}

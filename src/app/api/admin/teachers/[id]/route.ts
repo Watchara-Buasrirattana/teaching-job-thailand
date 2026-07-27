@@ -92,6 +92,9 @@ export async function DELETE(
         const { id } = await params;
         const teacher = await prisma.teacher.findUnique({ where: { id } });
         if (!teacher) return NextResponse.json({ success: false, message: "Not found" });
+        
+        // ลบ review ที่ผูกกับ teacher นี้ก่อน
+        await prisma.review.deleteMany({ where: { teacherId: id } });
 
         await prisma.teacher.delete({ where: { id } });
 
@@ -99,6 +102,7 @@ export async function DELETE(
             await deleteFile(teacher.image);
         }
 
+        // จด Log
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
         if (adminToken) {
@@ -113,6 +117,7 @@ export async function DELETE(
 
         return NextResponse.json({ success: true });
     } catch (error) {
+        console.error("DELETE Error:", error);
         return NextResponse.json({ success: false, message: "Delete failed" }, { status: 500 });
     }
 }
