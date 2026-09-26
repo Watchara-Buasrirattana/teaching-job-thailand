@@ -35,12 +35,12 @@ export default function NewsCard({ id, slug, createdAt, title, detail, date, img
                 href={newsUrl}
                 className="group block bg-primary overflow-hidden shadow-sm hover:shadow-xl transition-all border-b-4 border-primary"
             >
-                <div className="relative aspect-video w-full overflow-hidden">
+                <div className="relative aspect-video w-full overflow-hidden bg-black">
                     <Image
                         src={img}
                         alt={title}
                         fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="object-contain group-hover:scale-110 transition-transform duration-500"
                     />
                 </div>
 
