@@ -1,10 +1,10 @@
+// src/app/api/admin/news/route.ts
 import { logAdminAction } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { uploadFile, uploadGalleryFiles } from '@/lib/upload'
 import { cookies } from 'next/headers';
+// ตัด import uploadFile, uploadGalleryFiles ออก — ไม่ใช้แล้ว
 
-// ดึงข้อมูลข่าวทั้งหมด
 export async function GET() {
     try {
         const news = await prisma.news.findMany({
@@ -16,52 +16,37 @@ export async function GET() {
     }
 }
 
-// สร้างข่าวใหม่พร้อมอัปโหลดรูป
 export async function POST(request: Request) {
     try {
-        const formData = await request.formData();
+        const body = await request.json();
 
-        // 1. ดึงข้อมูลข้อความ
-        const headlineTh = formData.get('headlineTh') as string;
-        const headlineEn = formData.get('headlineEn') as string;
-        const bodyTh = formData.get('bodyTh') as string;
-        const bodyEn = formData.get('bodyEn') as string;
-        const status = formData.get('status') as string;
+        const {
+            headlineTh,
+            headlineEn,
+            bodyTh,
+            bodyEn,
+            status,
+            featuredImage,   // URL string หรือ null (upload ที่ client เสร็จแล้ว)
+            galleryImages,   // string[] (upload ที่ client เสร็จแล้ว)
+        } = body;
 
-        // 2. จัดการรูปปก (Featured Image)
-        let featuredImagePath = "";
-        const featuredFile = formData.get('featuredImage') as File;
-        if (featuredFile && featuredFile.size > 0) {
-            featuredImagePath = await uploadFile(featuredFile, 'featuredImage', 'news');
-        }
-
-        // 3. จัดการรูปแกลลอรี่ (ดึงไฟล์ทั้งหมดที่ส่งมาด้วยชื่อ 'galleryImages')
-        const galleryFiles = formData.getAll('galleryImages') as File[];
-        const galleryPaths = await uploadGalleryFiles(galleryFiles, 'news');
+        const featuredImagePath = featuredImage || "";
+        const galleryPaths = Array.isArray(galleryImages) ? galleryImages : [];
 
         let baseSlug = "untitled";
-
         if (headlineEn) {
-            // ถ้ามีชื่อภาษาอังกฤษ ให้แปลงชื่อภาษาอังกฤษเป็น URL
             baseSlug = headlineEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
         } else if (headlineTh) {
-            // ถ้าไม่มีภาษาอังกฤษ ให้ลองดึง "เฉพาะ" ตัวอักษรภาษาอังกฤษและตัวเลขจากชื่อไทย
             const engKeywords = headlineTh.match(/[a-zA-Z0-9]+/g);
-
             if (engKeywords && engKeywords.length > 0) {
-                // ถ้าดึงคำภาษาอังกฤษได้ (เช่นเจอ PKP, English, Camp, 2026) เอามาต่อด้วย -
                 baseSlug = engKeywords.join('-').toLowerCase();
             } else {
-                // ถ้าไม่มีภาษาอังกฤษปนอยู่เลย ให้เอาชื่อภาษาไทยมาทำ URL (รองรับภาษาไทย ก-ฮ)
-                // ลบตัวอักษรพิเศษออก เหลือแค่ ก-ฮ, ตัวเลข, และช่องว่าง แล้วเปลี่ยนช่องว่างเป็น -
                 baseSlug = headlineTh.replace(/[^\w\sก-๙]/g, '').trim().replace(/\s+/g, '-');
             }
         }
 
-        // ป้องกันกรณี Slug ซ้ำกันด้วยการสุ่มตัวเลขต่อท้าย
         const uniqueSlug = `${baseSlug}-${Math.floor(Math.random() * 1000)}`;
 
-        // บันทึกลง Database
         const newNews = await prisma.news.create({
             data: {
                 headlineTh,
@@ -70,12 +55,11 @@ export async function POST(request: Request) {
                 bodyTh,
                 bodyEn,
                 featuredImage: featuredImagePath,
-                galleryImages: galleryPaths, // บันทึกเป็น JSON array
+                galleryImages: galleryPaths,
                 status: status || 'Draft'
             }
         });
 
-        // จด Log การทำงาน
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
         if (adminToken) {

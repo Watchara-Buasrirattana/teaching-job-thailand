@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import { FiSearch, FiTrash2, FiEdit, FiPlus, FiX, FiCheck, FiAlertTriangle } from 'react-icons/fi';
 import { FaSort, FaSortUp, FaSortDown } from 'react-icons/fa';
 import { convertToWebP, convertAllToWebP } from '@/lib/imageUtils';
+import { uploadFileDirect, uploadGalleryFilesDirect } from '@/lib/upload-client';
 
 export default function NewsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,10 +87,10 @@ export default function NewsPage() {
     };
 
     const getSortIcon = (columnKey: string) => {
-            if (sortConfig.key !== columnKey || sortConfig.direction === null) return <FaSort className="text-gray-300 ml-1 inline" />;
-            if (sortConfig.direction === 'asc') return <FaSortUp className="text-primary ml-1 inline" />;
-            return <FaSortDown className="text-primary ml-1 inline" />;
-        };
+        if (sortConfig.key !== columnKey || sortConfig.direction === null) return <FaSort className="text-gray-300 ml-1 inline" />;
+        if (sortConfig.direction === 'asc') return <FaSortUp className="text-primary ml-1 inline" />;
+        return <FaSortDown className="text-primary ml-1 inline" />;
+    };
 
     // 2. รีเซ็ตฟอร์ม
     const resetForm = () => {
@@ -176,37 +177,53 @@ export default function NewsPage() {
     const handleSubmit = async (status: 'Published' | 'Draft') => {
         setIsSubmitting(true);
         try {
-            const formData = new FormData();
-            formData.append('headlineTh', headlineTh);
-            formData.append('headlineEn', headlineEn);
-            formData.append('bodyTh', bodyTh);
-            formData.append('bodyEn', bodyEn);
-            formData.append('status', status);
+            // 1. Upload รูปตรงไป PHP ก่อน (client-side) ไม่ผ่าน Netlify function
+            let featuredImageUrl: string | null = featuredPreview && !featuredImage
+                ? featuredPreview // ใช้ URL เดิมถ้าไม่ได้เปลี่ยนรูป
+                : null;
 
             if (featuredImage) {
-                formData.append('featuredImage', featuredImage);
-            } else if (!featuredPreview && editId) {
-                formData.append('removeFeatured', 'true');
+                featuredImageUrl = await uploadFileDirect(featuredImage, 'featuredImage', 'news');
             }
 
-            formData.append('existingGallery', JSON.stringify(existingGallery));
-            galleryImages.forEach(file => formData.append('galleryImages', file));
+            const newGalleryUrls = galleryImages.length > 0
+                ? await uploadGalleryFilesDirect(galleryImages, 'news')
+                : [];
+
+            const finalGallery = [...existingGallery, ...newGalleryUrls];
+
+            // 2. ส่งแค่ text fields + URL strings — payload เล็ก ไม่มีไฟล์เลย
+            const payload = {
+                headlineTh,
+                headlineEn,
+                bodyTh,
+                bodyEn,
+                status,
+                featuredImage: featuredImageUrl,
+                removeFeatured: !featuredImageUrl && !!editId,
+                galleryImages: finalGallery,
+            };
 
             const url = editId ? `/api/admin/news/${editId}` : '/api/admin/news';
             const method = editId ? 'PUT' : 'POST';
 
-            const res = await fetch(url, { method, body: formData });
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
             const result = await res.json();
 
             if (result.success) {
                 setIsModalOpen(false);
                 fetchNews();
                 resetForm();
-                setShowSuccessModal(true); // โชว์ Popup Success
+                setShowSuccessModal(true);
             } else {
                 alert("Error: " + result.message);
             }
         } catch (error) {
+            console.error(error);
             alert("Upload failed.");
         } finally {
             setIsSubmitting(false);

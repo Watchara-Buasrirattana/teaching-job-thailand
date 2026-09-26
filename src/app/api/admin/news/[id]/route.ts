@@ -1,6 +1,7 @@
+// src/app/api/admin/news/[id]/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { uploadFile, uploadGalleryFiles, deleteFile } from '@/lib/upload'
+import { deleteFile } from '@/lib/upload'
 import { logAdminAction } from '@/lib/logger';
 import { cookies } from 'next/headers';
 
@@ -13,53 +14,47 @@ export async function PUT(
         const cookieStore = await cookies();
         const adminToken = cookieStore.get('admin_token')?.value;
 
-        // ถ้าไม่มี Cookie แปลว่าไม่ได้ล็อกอิน ให้เตะออกเลย (ป้องกันคนนอกยิง API ลบข่าว)
         if (!adminToken) {
             return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
         }
 
         const { id } = await params;
+        const body = await request.json();
 
-        const formData = await request.formData();
-
-        // ใช้ id ที่เป็น String ค้นหา
         const oldNews = await prisma.news.findUnique({ where: { id } });
         if (!oldNews) return NextResponse.json({ success: false, message: "News not found" }, { status: 404 });
 
-        // ... โค้ดรับข้อมูล (headline, body, status) เหมือนเดิม ...
-        const headlineTh = formData.get('headlineTh') as string;
-        const headlineEn = formData.get('headlineEn') as string;
-        const bodyTh = formData.get('bodyTh') as string;
-        const bodyEn = formData.get('bodyEn') as string;
-        const status = formData.get('status') as string;
+        const {
+            headlineTh,
+            headlineEn,
+            bodyTh,
+            bodyEn,
+            status,
+            featuredImage,     // URL ใหม่ (ถ้าเปลี่ยนรูป) หรือ URL เดิม หรือ null/removeFeatured
+            removeFeatured,
+            galleryImages,     // string[] สุดท้าย (existing ที่เหลือ + ใหม่ที่ upload แล้ว)
+        } = body;
 
         let featuredImagePath = oldNews.featuredImage;
-        const featuredFile = formData.get('featuredImage') as File;
 
-        if (featuredFile && featuredFile.size > 0) {
-            if (oldNews.featuredImage) {
-                await deleteFile(oldNews.featuredImage);
-            }
-            featuredImagePath = await uploadFile(featuredFile, 'featuredImage', 'news');
+        if (removeFeatured) {
+            if (oldNews.featuredImage) await deleteFile(oldNews.featuredImage);
+            featuredImagePath = "";
+        } else if (featuredImage && featuredImage !== oldNews.featuredImage) {
+            // รูปเปลี่ยน (URL ใหม่จาก client upload) → ลบรูปเก่าทิ้ง
+            if (oldNews.featuredImage) await deleteFile(oldNews.featuredImage);
+            featuredImagePath = featuredImage;
         }
 
-        // ... โค้ดจัดการแกลลอรี่ (Gallery) เหมือนเดิม ...
-        const existingGalleryStr = formData.get('existingGallery') as string;
-        let keptGallery: string[] = [];
-        if (existingGalleryStr) keptGallery = JSON.parse(existingGalleryStr);
-
         const oldGallery = (oldNews.galleryImages as string[]) || [];
-        const imagesToDelete = oldGallery.filter(img => !keptGallery.includes(img));
+        const finalGallery = Array.isArray(galleryImages) ? galleryImages : oldGallery;
+
+        // ลบรูป gallery เก่าที่ไม่อยู่ใน finalGallery แล้ว
+        const imagesToDelete = oldGallery.filter(img => !finalGallery.includes(img));
         for (const img of imagesToDelete) {
             await deleteFile(img);
         }
 
-        const galleryFiles = formData.getAll('galleryImages') as File[];
-        const newGalleryPaths = await uploadGalleryFiles(galleryFiles, 'news');
-
-        const finalGallery = [...keptGallery, ...newGalleryPaths];
-
-        // --- 3. บันทึกลง Database ---
         const updatedNews = await prisma.news.update({
             where: { id },
             data: {

@@ -93,7 +93,7 @@ export default async function NewsDetail({ params }: { params: Params }) {
                                 src={mainImage}
                                 alt={title || "News Image"}
                                 fill
-                                className="object-cover"
+                                className="object-contain"
                                 priority
                                 sizes="(max-width: 1280px) 100vw, 1280px"
                             />
@@ -116,7 +116,7 @@ export default async function NewsDetail({ params }: { params: Params }) {
                                         src={img}
                                         alt={`${title} - รูปที่ ${index + 1}`}
                                         fill
-                                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                        className="object-contain group-hover:scale-110 transition-transform duration-500"
                                         sizes="(max-width: 768px) 50vw, 25vw"
                                     />
                                 </div>

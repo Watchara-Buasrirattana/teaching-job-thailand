@@ -31,3 +31,16 @@ export async function uploadFileDirect(
     if (!result.success) throw new Error(result.message ?? 'Upload failed');
     return result.urls[fieldName];
 }
+
+export async function uploadGalleryFilesDirect(
+    files: File[],
+    folder: 'news' | 'teachers' | 'applicants'
+): Promise<string[]> {
+    const urls: string[] = [];
+    for (const file of files) {
+        if (file.size === 0) continue;
+        const url = await uploadFileDirect(file, 'image', folder);
+        urls.push(url);
+    }
+    return urls;
+}
