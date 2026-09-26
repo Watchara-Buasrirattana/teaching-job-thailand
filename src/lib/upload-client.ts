@@ -18,18 +18,31 @@ export async function uploadFileDirect(
 
     const formData = new FormData();
     formData.append(fieldName, file);
-    formData.append('folder', folder);
     formData.append('expiry', String(expiry));
     formData.append('signature', signature);
 
-    const res = await fetch(process.env.NEXT_PUBLIC_UPLOAD_API_URL!, {
+    const uploadUrl = `${process.env.NEXT_PUBLIC_UPLOAD_API_URL}?folder=${folder}`;
+
+    const res = await fetch(uploadUrl, {
         method: 'POST',
-        body: formData, // ไม่ต้องใส่ Authorization Bearer ถาวรแล้ว
+        body: formData,
     });
 
+    if (!res.ok) {
+        throw new Error(`Upload HTTP error: ${res.status} ${res.statusText}`);
+    }
+
     const result = await res.json();
-    if (!result.success) throw new Error(result.message ?? 'Upload failed');
-    return result.urls[fieldName];
+    if (!result.success) {
+        throw new Error(`Upload failed: ${result.message ?? 'Unknown error'}`);
+    }
+
+    const url = result.urls?.[fieldName];
+    if (!url) {
+        throw new Error(`Upload succeeded but URL for "${fieldName}" is missing in response`);
+    }
+
+    return url;
 }
 
 export async function uploadGalleryFilesDirect(
